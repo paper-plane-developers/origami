@@ -1,0 +1,44 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $OriGallerySpoilerPage : Adw.Bin {
+    child: Box {
+        DropTarget drop_target {
+            actions: copy;
+            formats: "GdkFileList";
+        }
+        
+        orientation: vertical;
+        vexpand: true;
+
+        Adw.PreferencesPage {
+            Adw.PreferencesGroup {
+                title: "Spoiler Widget";
+
+                header-suffix: ToggleButton {
+                    valign: center;
+                    label: "Hidden";
+                    active: bind-property spoiler.hidden bidirectional;
+                };
+
+                $OriSpoilerOverlay spoiler {
+                    styles ["card"]
+
+                    overflow: hidden;
+                    vexpand: true;
+                    // height-request: 400;
+
+                    // the most important property
+                    hidden: true;
+
+                    child:  Adw.StatusPage {
+                        title: "Drop Any Pictures Here";
+                        description: "To see how will they look under the spoiler";
+                    };    
+                }
+            }
+        }
+
+                    
+    };
+}
