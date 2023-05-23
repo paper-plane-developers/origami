@@ -270,9 +270,9 @@ mod imp {
             let texture_bounds = {
                 // Texture have 2x size, so we divide it to scale correctly;
                 let width = texture.width() as f32 / 2.0;
-                let heigth = texture.height() as f32 / 2.0;
+                let height = texture.height() as f32 / 2.0;
 
-                graphene::Rect::new(0.0, 0.0, width, heigth)
+                graphene::Rect::new(0.0, 0.0, width, height)
             };
 
             for (x, y) in speed_modifiers {
