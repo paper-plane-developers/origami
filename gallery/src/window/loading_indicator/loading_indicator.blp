@@ -1,0 +1,80 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $OriGalleryLoadingIndicatorPage : Adw.Bin {
+  child:
+  ScrolledWindow {
+    child: Adw.Clamp {
+        child: Box {
+            orientation: vertical;
+            vexpand: true;
+            valign: center;
+
+            Box {
+                spacing: 32;
+                margin-bottom: 32;
+                halign: center;
+
+                $OriLoadingIndicator {
+                    valign: center;
+
+                    progress: bind-property progress_adjustment.value;
+                }
+
+                $OriLoadingIndicator {
+                    valign: center;
+                    height-request: 48;
+                        width-request: 48;
+                
+                        progress: bind-property progress_adjustment.value;
+                    }
+
+                    $OriLoadingIndicator {
+                        valign: center;
+                        height-request: 64;
+                        width-request: 64;
+                
+                        progress: bind-property progress_adjustment.value;
+                    }
+                }
+
+                Label {
+                    styles ["title-1"]
+
+                    label: "Loading Indicator";
+
+                    margin-bottom: 16;
+                }
+
+                Label {
+                    label: "For cases when progress bar doesn't fit";
+
+                    wrap: true;
+                    justify: center;
+                }
+
+                Adw.PreferencesGroup {
+                    margin-top: 32;
+
+                    Adw.ActionRow {
+                        title: "Progress";
+
+                        [suffix]
+                        SpinButton {
+                            valign: center;
+                            digits: 1;
+                            adjustment: progress_adjustment;
+                        }
+                    }
+                }
+            };
+        };
+    };
+}
+
+Adjustment progress_adjustment {
+    lower: 0.0;
+    upper: 1.0;
+    value: 0.7;
+    step-increment: 0.1;
+}

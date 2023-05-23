@@ -67,6 +67,13 @@ template $SpoilerWindow : Adw.ApplicationWindow {
 
                     child: $OriGallerySpoilerPage {};
                 }
+
+                StackPage {
+                    name: "loading_indicator";
+                    title: "Loading Indicator";
+
+                    child: $OriGalleryLoadingIndicatorPage {};
+                }
             }
         }
     }
