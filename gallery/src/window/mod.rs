@@ -58,7 +58,27 @@ glib::wrapper! {
 }
 
 impl SpoilerWindow {
-    pub fn new(app: &impl IsA<gio::Application>) -> Self {
-        glib::Object::builder().property("application", app).build()
+    pub fn new(app: &impl IsA<gio::Application>, page: Option<String>) -> Self {
+        let obj: Self = glib::Object::builder().property("application", app).build();
+
+        if let Some(name) = page {
+            let pages: Vec<_> = obj
+                .imp()
+                .stack
+                .pages()
+                .iter::<gtk::StackPage>()
+                .filter_map(|res| res.ok())
+                .filter_map(|page| page.name())
+                .collect();
+
+            if pages.iter().any(|n| n == &name) {
+                obj.imp().stack.set_visible_child_name(&name);
+            } else {
+                eprintln!("Page {name} is not available");
+                eprintln!("Supported pages: {}", pages.join(", "));
+            }
+        }
+
+        obj
     }
 }
