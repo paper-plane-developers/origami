@@ -99,6 +99,11 @@ mod imp {
 }
 
 glib::wrapper! {
+    #[doc(alias = "OriLoadingIndicator")]
+    /// Circular loading indicator
+    ///
+    /// # Properties
+    /// * progress: [f64] between 0 and 1
     pub struct LoadingIndicator(ObjectSubclass<imp::LoadingIndicator>)
         @extends gtk::Widget;
 }

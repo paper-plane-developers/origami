@@ -290,11 +290,43 @@ mod imp {
 }
 
 glib::wrapper! {
+    #[doc(alias = "OriSpoilerOverlay")]
+    /// Telegram-like spoiler widget
+    ///
+    /// It displays blur and particles over the widget
+    /// and removes them with animation after a click
+    ///
+    /// # Properties
+    ///
+    /// * Hidden: [bool].
+    /// Set to [true] to hide the child and
+    /// it will appear automatically when user clicks the [overlay](super::SpoilerOverlay).
+    ///
+    /// * Animation: readonly [adw::TimedAnimation].
+    /// Controls how overlay appears and disappears,
+    /// It was made as a property to be visible in the Inspector
+    ///
+    /// # Bluerpint example
+    /// ```blp
+    /// $OriSpoilerOverlay {
+    ///     child: Picture {
+    ///         file: "some file";
+    ///     }
+    ///
+    ///     hidden: true;
+    /// }
+    /// ```
     pub struct SpoilerOverlay(ObjectSubclass<imp::SpoilerOverlay>)
-        @extends adw::Bin, gtk::Widget;
+        @extends adw::Bin, gtk::Widget, @implements gtk::Accessible, gtk::Buildable, gtk::ConstraintTarget;
 }
 
+impl SpoilerOverlay {}
+
 impl SpoilerOverlay {
+    /// Force remove current blur texture from the cache
+    ///
+    /// [SpoilerOverlay] automatically refreshes blur on size change or when the child it replaced
+    /// but it doesn't handle when the child redraws something
     pub fn refresh_blur(&self) {
         self.imp().blurred_texture_cache.take();
     }
