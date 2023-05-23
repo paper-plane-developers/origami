@@ -64,12 +64,12 @@ mod imp {
             });
 
             self.parent_constructed();
-            self.obj().connect_visible_notify(|widget| {
-                if widget.is_visible() {
+            self.obj().connect_hidden_notify(|widget| {
+                if widget.hidden() {
                     widget.imp().start_time.set(widget.time());
                     widget.add_tick_callback(|widget, _clock| {
                         widget.queue_draw();
-                        Continue(widget.is_visible())
+                        Continue(widget.hidden())
                     });
                 }
             });
@@ -116,7 +116,6 @@ mod imp {
             self.parent_snapshot(snapshot);
 
             let widget = self.obj();
-            let texture = &*PARTICLE_TEXTURE;
 
             let width = widget.width() as f32;
             let height = widget.height() as f32;
@@ -128,6 +127,7 @@ mod imp {
             } else {
                 self.click_point.get()
             };
+
             let center = &graphene::Point::new(x, y);
 
             let max_corner_length = [
@@ -164,20 +164,12 @@ mod imp {
                 snapshot.pop();
             }
 
-            let texture_bounds = {
-                // Texture have 2x size, so we divide it to scale correctly;
-                let width = texture.width() as f32 / 2.0;
-                let heigth = texture.height() as f32 / 2.0;
-
-                graphene::Rect::new(0.0, 0.0, width, heigth)
-            };
-
             self.render_blur_texture(snapshot, &bounds);
 
             let time = widget.time() - self.start_time.get();
             let time = time as f32 / 50000.0;
 
-            let layers = [
+            let speed_modifiers = &[
                 (0.468, 0.287),
                 (0.305, 0.1967),
                 (0.316, 0.3239),
@@ -188,16 +180,7 @@ mod imp {
                 (-0.8098, -0.8822),
             ];
 
-            for (x, y) in layers {
-                let x = x * time;
-                let y = y * time;
-
-                snapshot.push_repeat(&bounds, None);
-                snapshot.translate(&graphene::Point::new(x, y));
-                snapshot.append_texture(texture, &texture_bounds);
-                snapshot.translate(&graphene::Point::new(-x, -y));
-                snapshot.pop();
-            }
+            self.render_particle_layers(snapshot, &bounds, time, speed_modifiers);
 
             if radius > 0.0 {
                 snapshot.pop();
@@ -212,6 +195,7 @@ mod imp {
             let animation = self.animation.get().unwrap();
             animation.set_reverse(hidden);
             animation.play();
+
             self.hidden.set(hidden);
         }
 
@@ -273,6 +257,35 @@ mod imp {
                 snapshot.append_color(&gdk::RGBA::new(0.3, 0.3, 0.3, 1.0), bounds);
             }
         }
+
+        fn render_particle_layers(
+            &self,
+            snapshot: &gtk::Snapshot,
+            bounds: &graphene::Rect,
+            time: f32,
+            speed_modifiers: &[(f32, f32)],
+        ) {
+            let texture = &*PARTICLE_TEXTURE;
+
+            let texture_bounds = {
+                // Texture have 2x size, so we divide it to scale correctly;
+                let width = texture.width() as f32 / 2.0;
+                let heigth = texture.height() as f32 / 2.0;
+
+                graphene::Rect::new(0.0, 0.0, width, heigth)
+            };
+
+            for (x, y) in speed_modifiers {
+                let x = x * time;
+                let y = y * time;
+
+                snapshot.push_repeat(bounds, None);
+                snapshot.translate(&graphene::Point::new(x, y));
+                snapshot.append_texture(texture, &texture_bounds);
+                snapshot.translate(&graphene::Point::new(-x, -y));
+                snapshot.pop();
+            }
+        }
     }
 }
 
@@ -282,7 +295,7 @@ glib::wrapper! {
 }
 
 impl SpoilerOverlay {
-    pub fn drop_cache(&self) {
+    pub fn refresh_blur(&self) {
         self.imp().blurred_texture_cache.take();
     }
 

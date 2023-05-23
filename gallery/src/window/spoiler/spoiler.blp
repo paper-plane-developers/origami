@@ -13,12 +13,16 @@ template $OriGallerySpoilerPage : Adw.Bin {
 
         Adw.PreferencesPage {
             Adw.PreferencesGroup {
-                title: "Spoiler Widget";
+                title: "Spoiler Overlay";
 
-                header-suffix: ToggleButton {
-                    valign: center;
-                    label: "Hidden";
-                    active: bind-property spoiler.hidden bidirectional;
+                header-suffix: Revealer revealer {
+                    transition-type: crossfade;
+
+                    Button hide_content {
+                        label: "Hide Content";
+
+                        clicked => $hide_content(template);
+                    }
                 };
 
                 $OriSpoilerOverlay spoiler {
@@ -26,19 +30,16 @@ template $OriGallerySpoilerPage : Adw.Bin {
 
                     overflow: hidden;
                     vexpand: true;
-                    // height-request: 400;
 
                     // the most important property
-                    hidden: true;
+                    hidden: bind-property revealer.reveal-child inverted bidirectional;
 
                     child:  Adw.StatusPage {
-                        title: "Drop Any Pictures Here";
+                        title: "Drop any pictures here";
                         description: "To see how will they look under the spoiler";
                     };    
                 }
             }
         }
-
-                    
     };
 }

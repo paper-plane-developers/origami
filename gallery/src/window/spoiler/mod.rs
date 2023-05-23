@@ -23,6 +23,7 @@ mod imp {
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
+            klass.bind_template_callbacks();
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -45,7 +46,7 @@ mod imp {
                             .child()
                             .and_downcast::<gtk::Picture>() {
                                 picture.set_file(files.first());
-                                imp.spoiler.drop_cache();
+                                imp.spoiler.refresh_blur();
                         } else {
                             let picture = gtk::Picture::for_file(files.first().unwrap());
                             picture.set_content_fit(gtk::ContentFit::Cover);
@@ -65,6 +66,14 @@ mod imp {
 
     impl WidgetImpl for SpoilerPage {}
     impl BinImpl for SpoilerPage {}
+
+    #[gtk::template_callbacks]
+    impl SpoilerPage {
+        #[template_callback]
+        fn hide_content(&self) {
+            self.spoiler.set_hidden(true);
+        }
+    }
 }
 
 glib::wrapper! {
