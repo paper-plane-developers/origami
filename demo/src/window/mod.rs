@@ -1,4 +1,5 @@
 mod loading_indicator;
+mod shimmer_effect;
 mod spoiler;
 
 use adw::prelude::*;
@@ -23,8 +24,9 @@ mod imp {
         type ParentType = adw::ApplicationWindow;
 
         fn class_init(klass: &mut Self::Class) {
-            spoiler::SpoilerPage::static_type();
             loading_indicator::LoadingIndicatorPage::static_type();
+            shimmer_effect::ShimmerEffectPage::static_type();
+            spoiler::SpoilerPage::static_type();
 
             klass.bind_template();
         }

@@ -1,0 +1,65 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $OriDemoShimmerEffectPage : Adw.Bin {
+    child: Adw.StatusPage {
+        title: "Shimmer Effect";
+
+        Box {
+            orientation: vertical;
+            halign: center;
+
+
+            $OriShimmerEffect {
+                playing: true;
+
+                child: Box {
+                    Image {
+                        icon-name: "folder-documents-symbolic";
+                        pixel-size: 128;
+                    }
+
+                    Image {
+                        icon-name: "folder-documents-symbolic";
+                        pixel-size: 128;
+                    }
+
+                    Image {
+                        icon-name: "folder-documents-symbolic";
+                        pixel-size: 128;
+                    }
+                };
+            }
+
+
+            Box {
+                $OriShimmerEffect {
+                    playing: true;
+                    
+                    Image {
+                        icon-name: "folder-documents-symbolic";
+                        pixel-size: 128;
+                    }
+                }
+
+                $OriShimmerEffect {
+                    playing: true;
+                    
+                    Image {
+                        icon-name: "folder-documents-symbolic";
+                        pixel-size: 128;
+                    }
+                }
+
+                $OriShimmerEffect {
+                    playing: true;
+                    
+                    Image {
+                        icon-name: "folder-documents-symbolic";
+                        pixel-size: 128;
+                    }
+                }
+            }
+        }
+    };
+}
