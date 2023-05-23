@@ -20,7 +20,7 @@ template $SpoilerWindow : Adw.ApplicationWindow {
 
                 [title]
                 Adw.WindowTitle {
-                    title: "Origami";
+                    title: "Origami Demo";
                 }
             }
 
@@ -57,7 +57,7 @@ template $SpoilerWindow : Adw.ApplicationWindow {
                     child: Adw.StatusPage {
                         vexpand: true;
 
-                        title: "Welcome to Origami Gallery";
+                        title: "Welcome to Origami Demo";
                     };
                 }
 
@@ -65,14 +65,14 @@ template $SpoilerWindow : Adw.ApplicationWindow {
                     name: "spoiler";
                     title: "Spoiler";
 
-                    child: $OriGallerySpoilerPage {};
+                    child: $OriDemoSpoilerPage {};
                 }
 
                 StackPage {
                     name: "loading_indicator";
                     title: "Loading Indicator";
 
-                    child: $OriGalleryLoadingIndicatorPage {};
+                    child: $OriDemoLoadingIndicatorPage {};
                 }
             }
         }

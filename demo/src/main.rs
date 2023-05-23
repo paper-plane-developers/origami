@@ -16,7 +16,7 @@ fn main() {
     }
 
     let app = adw::Application::builder()
-        .application_id("com.github.paper-plane-developers.OrigamiGallery")
+        .application_id("com.github.paper-plane-developers.OriDemo")
         .build();
 
     app.connect_activate(move |app| SpoilerWindow::new(app, page.clone()).present());

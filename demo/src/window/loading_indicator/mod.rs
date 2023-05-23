@@ -10,7 +10,7 @@ mod imp {
 
     #[glib::object_subclass]
     impl ObjectSubclass for LoadingIndicatorPage {
-        const NAME: &'static str = "OriGalleryLoadingIndicatorPage";
+        const NAME: &'static str = "OriDemoLoadingIndicatorPage";
         type Type = super::LoadingIndicatorPage;
         type ParentType = adw::Bin;
 

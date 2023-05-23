@@ -17,7 +17,7 @@ mod imp {
 
     #[glib::object_subclass]
     impl ObjectSubclass for SpoilerPage {
-        const NAME: &'static str = "OriGallerySpoilerPage";
+        const NAME: &'static str = "OriDemoSpoilerPage";
         type Type = super::SpoilerPage;
         type ParentType = adw::Bin;
 
