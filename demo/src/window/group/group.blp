@@ -1,0 +1,636 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $OriDemoGroupPage: Adw.Bin {
+    child: Adw.StatusPage {
+        title: "Group";
+        description: "Layouts widgets dependend on their aspect ratio";
+
+        child: Adw.Clamp {
+            maximum-size: 600;
+            tightening-threshold: 1;
+
+            child: Box {
+                orientation: vertical;
+
+                Adw.SpinRow {
+                    styles [
+                        "card"
+                    ]
+
+                    title: "Spacing";
+
+                    adjustment: Adjustment spacing_adjustment {
+                        lower: 0;
+                        upper: 16;
+                        step-increment: 1;
+                    };
+                }
+
+                Box {
+                    can-target: false;
+                    orientation: horizontal;
+                    hexpand: true;
+                    spacing: 16;
+
+                    Box {
+                        orientation: vertical;
+                        hexpand: true;
+                        spacing: 16;
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 5;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 2;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 3;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 5;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 5;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+                    }
+
+                    Box {
+                        orientation: vertical;
+                        hexpand: true;
+                        spacing: 16;
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 5;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 3;
+                                height-request: 7;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 5;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 3;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 5;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 9;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 8;
+                                height-request: 10;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 3;
+                                height-request: 8;
+                            }
+                        }
+
+                        $OriGroup {
+                            spacing: bind spacing_adjustment.value;
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 7;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 7;
+                                height-request: 8;
+                            }
+
+                            Button {
+                                styles [
+                                    "opaque"
+                                ]
+
+                                width-request: 6;
+                                height-request: 8;
+                            }
+                        }
+
+                        Box {
+                            orientation: vertical;
+
+                            $OriGroup {
+                                spacing: bind spacing_adjustment.value;
+
+                                Button {
+                                    styles [
+                                        "opaque"
+                                    ]
+
+                                    width-request: 6;
+                                    height-request: 5;
+                                }
+
+                                Button {
+                                    styles [
+                                        "opaque"
+                                    ]
+
+                                    width-request: 6;
+                                    height-request: 7;
+                                }
+
+                                Button {
+                                    styles [
+                                        "opaque"
+                                    ]
+
+                                    width-request: 8;
+                                    height-request: 10;
+                                }
+
+                                Button {
+                                    styles [
+                                        "opaque"
+                                    ]
+
+                                    width-request: 6;
+                                    height-request: 7;
+                                }
+
+                                Button {
+                                    styles [
+                                        "opaque"
+                                    ]
+
+                                    width-request: 8;
+                                    height-request: 5;
+                                }
+
+                                Button {
+                                    styles [
+                                        "opaque"
+                                    ]
+
+                                    width-request: 6;
+                                    height-request: 8;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        };
+    };
+}
