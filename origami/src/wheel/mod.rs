@@ -1,5 +1,7 @@
+mod formatter;
 mod section;
 
+use glib::clone;
 use gtk::gdk;
 use gtk::glib;
 use gtk::graphene;
@@ -9,15 +11,13 @@ use gtk::subclass::prelude::*;
 
 use section::Section;
 
-mod imp {
-    use std::cell::RefCell;
+pub use formatter::Formatter;
 
+mod imp {
     use super::*;
 
     #[derive(Default)]
-    pub struct Wheel {
-        sections: RefCell<Vec<Section>>,
-    }
+    pub struct Wheel {}
 
     #[glib::object_subclass]
     impl ObjectSubclass for Wheel {
@@ -30,22 +30,79 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            let sections = &mut self.sections.borrow_mut();
-            let section = Section::new();
+            let widget = &*self.obj();
 
-            section.set_min(0);
-            section.set_max(59);
+            widget.set_layout_manager(Some(gtk::BoxLayout::new(gtk::Orientation::Horizontal)));
 
-            section.set_parent(self.obj().as_ref());
-            sections.push(section);
+            widget.set_hexpand(true);
+
+            widget.set_halign(gtk::Align::Center);
+
+            let year_section = Section::new();
+
+            year_section.set_min(1960);
+            year_section.set_max(2060);
+            year_section.set_selected(2023);
+
+            year_section.set_width_request(80);
+
+            year_section.set_parent(widget);
+
+            let month_section = Section::new();
+
+            month_section.set_min(0);
+            month_section.set_max(11);
+
+            month_section.set_width_request(120);
+
+            let month_formatter = Formatter::new(move |index| {
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ][index.rem_euclid(12) as usize]
+                    .to_owned()
+            });
+
+            month_section.set_formatter(month_formatter);
+
+            month_section.set_parent(widget);
+
+            let day_section = Section::new();
+
+            day_section.set_min(1);
+            day_section.set_max(31);
+
+            day_section.set_width_request(60);
+
+            day_section.set_parent(widget);
+
+            let day_updater = clone!(@weak year_section, @weak month_section, @weak day_section => move |_: &Section| {
+                let year = year_section.selected();
+                let month = month_section.selected();
+
+                let month = glib::DateMonth::__Unknown(month as i32 + 1);
+
+                let day_count = glib::Date::days_in_month(month, year as u16);
+
+                day_section.set_max(day_count as i64);
+            });
+
+            month_section.connect_selected_notify(day_updater.clone());
+            year_section.connect_selected_notify(day_updater.clone());
         }
     }
 
     impl WidgetImpl for Wheel {
-        fn size_allocate(&self, width: i32, height: i32, baseline: i32) {
-            self.sections.borrow()[0].allocate(width, height, baseline, None);
-        }
-
         fn snapshot(&self, snapshot: &gtk::Snapshot) {
             let widget = self.obj();
 
@@ -77,16 +134,17 @@ mod imp {
 
             snapshot.pop(); // mask 2
 
-            let color = widget.color();
+            let mut color = widget.color();
 
-            snapshot.append_color(
-                &color,
-                &graphene::Rect::new(0.0, height * 0.5 - 20.0, width, 1.0),
-            );
-            snapshot.append_color(
-                &color,
-                &graphene::Rect::new(0.0, height * 0.5 + 20.0, width, 1.0),
-            );
+            color.set_alpha(0.1);
+
+            let selection_bounds = graphene::Rect::new(0.0, height * 0.5 - 20.0, width, 40.0);
+
+            snapshot.push_rounded_clip(&gsk::RoundedRect::from_rect(selection_bounds, 8.0));
+
+            snapshot.append_color(&color, &selection_bounds);
+
+            snapshot.pop();
         }
     }
 }
