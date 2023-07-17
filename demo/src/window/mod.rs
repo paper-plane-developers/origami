@@ -25,6 +25,7 @@ mod imp {
         fn class_init(klass: &mut Self::Class) {
             simple_pages::LoadingIndicatorPage::static_type();
             simple_pages::ShimmerEffectPage::static_type();
+            simple_pages::WheelPage::static_type();
             spoiler::SpoilerPage::static_type();
 
             klass.bind_template();
