@@ -48,3 +48,5 @@ page!(
     "src/window/simple_pages/loading_indicator.blp",
     imp2
 );
+
+page!(WheelPage, "src/window/simple_pages/wheel.blp", imp3);
