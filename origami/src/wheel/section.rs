@@ -5,8 +5,10 @@ use gtk::glib;
 use gtk::graphene;
 use gtk::gsk;
 
+use super::Formatter;
+
 mod imp {
-    use std::cell::{Cell, OnceCell};
+    use std::cell::{Cell, OnceCell, RefCell};
 
     use super::*;
 
@@ -15,18 +17,21 @@ mod imp {
     pub struct Section {
         inscriptions: [gtk::Inscription; 5],
 
-        #[property(get, set)]
-        pub(super) min: Cell<i32>,
+        #[property(get, set = Self::set_min)]
+        pub(super) min: Cell<i64>,
 
-        #[property(get, set)]
-        pub(super) max: Cell<i32>,
+        #[property(get, set = Self::set_max)]
+        pub(super) max: Cell<i64>,
 
         #[property(get, set = Self::set_selected)]
-        pub(super) selected: Cell<i32>,
+        pub(super) selected: Cell<i64>,
 
         pub(super) active_shift: Cell<f64>,
 
         pub(super) animation: OnceCell<adw::SpringAnimation>,
+
+        #[property(get, set)]
+        pub(super) formatter: RefCell<Formatter>,
     }
 
     #[glib::object_subclass]
@@ -72,7 +77,7 @@ mod imp {
 
                     let new_shift = imp.active_shift.get() - y * 0.1;
 
-                    let new_selected = imp.selected.get() - new_shift as i32;
+                    let new_selected = imp.selected.get() - new_shift as i64;
 
                     let min = imp.min.get();
                     let max = imp.max.get();
@@ -172,7 +177,7 @@ mod imp {
             let shift = self.selected.get();
 
             for (i, child) in self.inscriptions.iter().enumerate() {
-                let i = (i as i32 + shift).rem_euclid(5) - 2;
+                let i = (i as i64 + shift).rem_euclid(5) - 2;
 
                 let i = i as f64 + self.active_shift.get();
 
@@ -188,7 +193,7 @@ mod imp {
     }
 
     impl Section {
-        fn set_selected(&self, value: i32) {
+        fn set_selected(&self, value: i64) {
             if self.selected.get() == value {
                 return;
             }
@@ -198,18 +203,39 @@ mod imp {
             self.refresh_inscriptions();
         }
 
+        fn set_min(&self, value: i64) {
+            self.min.set(value);
+
+            if self.selected.get() < value {
+                self.obj().set_selected(value);
+            } else {
+                self.refresh_inscriptions();
+            }
+        }
+
+        fn set_max(&self, value: i64) {
+            self.max.set(value);
+
+            if self.selected.get() > value {
+                self.obj().set_selected(value);
+            } else {
+                self.refresh_inscriptions();
+            }
+        }
+
         fn refresh_inscriptions(&self) {
             let value = self.selected.get();
 
             for (i, child) in self.inscriptions.iter().enumerate() {
-                let i = (i as i32 + value).rem_euclid(5) - 2;
+                let i = (i as i64 + value).rem_euclid(5) - 2;
 
                 let index = i + value;
 
                 if index < self.min.get() || index > self.max.get() {
                     child.set_text(None);
                 } else {
-                    child.set_text(Some(&(index).to_string()));
+                    let string = self.formatter.borrow().format(index);
+                    child.set_text(Some(&string));
                 }
             }
 
