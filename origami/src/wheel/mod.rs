@@ -44,7 +44,7 @@ mod imp {
             year_section.set_max(2060);
             year_section.set_selected(2023);
 
-            year_section.set_width_request(80);
+            year_section.set_width_request(50);
 
             year_section.set_parent(widget);
 
@@ -53,7 +53,7 @@ mod imp {
             month_section.set_min(0);
             month_section.set_max(11);
 
-            month_section.set_width_request(120);
+            month_section.set_width_request(100);
 
             let month_formatter = Formatter::new(move |index| {
                 [
@@ -82,7 +82,11 @@ mod imp {
             day_section.set_min(1);
             day_section.set_max(31);
 
-            day_section.set_width_request(60);
+            day_section.set_width_request(40);
+
+            let day_formatter = Formatter::new(|day| format!("{:02}", day));
+
+            day_section.set_formatter(day_formatter);
 
             day_section.set_parent(widget);
 
@@ -99,6 +103,9 @@ mod imp {
 
             month_section.connect_selected_notify(day_updater.clone());
             year_section.connect_selected_notify(day_updater.clone());
+
+            year_section.set_margin_start(24);
+            day_section.set_margin_end(24);
         }
     }
 
