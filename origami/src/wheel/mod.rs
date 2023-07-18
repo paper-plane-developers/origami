@@ -14,11 +14,10 @@ use section::Section;
 
 pub use formatter::Formatter;
 
+pub use range_model::RangeModel;
+
 mod imp {
-    use super::{
-        range_model::{range_item_to_string_expression, RangeModel},
-        *,
-    };
+    use super::*;
 
     #[derive(Default)]
     pub struct Wheel {}
