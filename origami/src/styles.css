@@ -1,1 +1,5 @@
 /* Stylesheet for origami widgets */
+
+wheelsection:focus {
+    color: @accent_color;
+}
