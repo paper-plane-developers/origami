@@ -117,18 +117,3 @@ impl RangeModel {
             .build()
     }
 }
-
-pub fn range_item_to_string_expression() -> gtk::Expression {
-    let params: &[gtk::Expression] = &[];
-
-    gtk::ClosureExpression::with_callback(params, |items| {
-        let item: Option<RangeItem> = items.get(0).and_then(|v| v.get().ok());
-
-        if let Some(item) = item {
-            item.value().to_string()
-        } else {
-            String::new()
-        }
-    })
-    .upcast()
-}

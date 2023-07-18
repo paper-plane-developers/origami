@@ -1,6 +1,7 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::clone;
+use gtk::gdk;
 use gtk::gio;
 use gtk::glib;
 use gtk::graphene;
@@ -52,6 +53,7 @@ mod imp {
 
         fn class_init(klass: &mut Self::Class) {
             klass.set_css_name("wheelsection");
+            klass.set_accessible_role(gtk::AccessibleRole::List);
         }
     }
 
@@ -73,8 +75,14 @@ mod imp {
 
             let widget = &*self.obj();
 
+            widget.set_focusable(true);
+            widget.set_can_focus(true);
+
             for (i, child) in self.children.iter().enumerate() {
                 child.set_parent(widget);
+
+                child.set_can_focus(false);
+                child.set_focusable(false);
 
                 child.add_css_class("flat");
 
@@ -90,32 +98,76 @@ mod imp {
                     let animation = imp.deceleration_animation.get().unwrap();
 
                     imp.deceleration_progress.take();
+
+                    animation.set_initial_velocity(shift);
                     animation.set_value_to(shift);
                     animation.play();
                 }));
             }
+
+            let key_controller = gtk::EventControllerKey::new();
+
+            key_controller.connect_key_pressed(move |controller, key, _, _| {
+                let widget = controller.widget().downcast::<Self::Type>().unwrap();
+
+                let shift = if key == gdk::Key::Up {
+                    -1.0
+                } else if key == gdk::Key::Down {
+                    1.0
+                } else {
+                    return gtk::Inhibit(false);
+                };
+
+                let imp = widget.imp();
+
+                let animation = imp.deceleration_animation.get().unwrap();
+
+                imp.deceleration_progress.take();
+                animation.set_value_to(shift);
+                animation.play();
+
+                gtk::Inhibit(true)
+            });
+
+            widget.add_controller(key_controller);
+
+            let focus_controller = gtk::GestureClick::new();
+
+            focus_controller.connect_released(move |controller, _, _, _| {
+                let widget = controller.widget().downcast::<Self::Type>().unwrap();
+
+                widget.grab_focus();
+            });
+
+            focus_controller.set_propagation_phase(gtk::PropagationPhase::Capture);
+
+            widget.add_controller(focus_controller);
 
             let controller = gtk::EventControllerScroll::new(
                 gtk::EventControllerScrollFlags::VERTICAL
                     | gtk::EventControllerScrollFlags::KINETIC,
             );
 
-            controller.connect_scroll(clone!(@weak widget => @default-return gtk::Inhibit(false),
-                move  |_, _x, y| {
-                    widget.imp().handle_scroll(y * 0.1);
-                    gtk::Inhibit(true)
-            }));
+            controller.connect_scroll(move |controller, _x, y| {
+                let widget = controller.widget().downcast::<Self::Type>().unwrap();
+                widget.imp().handle_scroll(y * 0.1);
+                gtk::Inhibit(true)
+            });
 
-            controller.connect_scroll_begin(clone!(@weak widget => move |_| {
+            controller.connect_scroll_begin(move |controller| {
+                let widget = controller.widget().downcast::<Self::Type>().unwrap();
                 widget.imp().deceleration_animation.get().unwrap().pause();
                 widget.imp().pause_snap();
-            }));
+            });
 
-            controller.connect_scroll_end(clone!(@weak widget => move |_| {
+            controller.connect_scroll_end(|controller| {
+                let widget = controller.widget().downcast::<Self::Type>().unwrap();
                 widget.imp().animate_snap();
-            }));
+            });
 
-            controller.connect_decelerate(clone!(@weak widget => move |_, _, y| {
+            controller.connect_decelerate(move |controller, _, y| {
+                let widget = controller.widget().downcast::<Self::Type>().unwrap();
+
                 if y.abs() <= f64::EPSILON {
                     return;
                 }
@@ -132,7 +184,7 @@ mod imp {
                 animation.set_value_to(y * 0.01);
 
                 animation.play();
-            }));
+            });
 
             widget.add_controller(controller);
 
@@ -202,6 +254,9 @@ mod imp {
                 ));
 
                 child.allocate(width, size.height(), -1, Some(transform));
+
+                // I don't want items inside the selected area to be clickable
+                child.set_can_target(i.abs() >= 0.8)
             }
         }
     }
