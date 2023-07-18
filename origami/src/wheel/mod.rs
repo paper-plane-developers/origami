@@ -1,4 +1,5 @@
 mod formatter;
+mod range_model;
 mod section;
 
 use glib::clone;
@@ -14,7 +15,10 @@ use section::Section;
 pub use formatter::Formatter;
 
 mod imp {
-    use super::*;
+    use super::{
+        range_model::{range_item_to_string_expression, RangeModel},
+        *,
+    };
 
     #[derive(Default)]
     pub struct Wheel {}
@@ -38,74 +42,95 @@ mod imp {
 
             widget.set_halign(gtk::Align::Center);
 
-            let year_section = Section::new();
+            // let year_section = Section::new();
 
-            year_section.set_min(1960);
-            year_section.set_max(2060);
-            year_section.set_selected(2023);
+            // // year_section.set_min(1960);
+            // // year_section.set_max(2060);
+            // // year_section.set_selected(2023);
 
-            year_section.set_width_request(50);
+            // year_section.set_model(RangeModel::new(1960, 2060));
 
-            year_section.set_parent(widget);
+            // year_section.set_expression(Some(range_item_to_string_expression()));
 
-            let month_section = Section::new();
+            // year_section.set_width_request(50);
 
-            month_section.set_min(0);
-            month_section.set_max(11);
+            // year_section.set_parent(widget);
 
-            month_section.set_width_request(100);
+            // let month_section = Section::new();
 
-            let month_formatter = Formatter::new(move |index| {
-                [
-                    "January",
-                    "February",
-                    "March",
-                    "April",
-                    "May",
-                    "June",
-                    "July",
-                    "August",
-                    "September",
-                    "October",
-                    "November",
-                    "December",
-                ][index.rem_euclid(12) as usize]
-                    .to_owned()
-            });
+            // month_section.set_min(0);
+            // month_section.set_max(11);
 
-            month_section.set_formatter(month_formatter);
+            // month_section.set_width_request(100);
 
+            // let month_formatter = Formatter::new(move |index| {
+            //     [
+            //         "January",
+            //         "February",
+            //         "March",
+            //         "April",
+            //         "May",
+            //         "June",
+            //         "July",
+            //         "August",
+            //         "September",
+            //         "October",
+            //         "November",
+            //         "December",
+            //     ][index.rem_euclid(12) as usize]
+            //         .to_owned()
+            // });
+
+            // month_section.set_formatter(month_formatter);
+
+            // month_section.set_parent(widget);
+
+            // adw::EnumListModel::new(gtk::Orientation::static_type());
+
+            let month_model = gtk::StringList::new(&[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ]);
+
+            let month_section = Section::new(month_model, 10);
             month_section.set_parent(widget);
 
-            let day_section = Section::new();
+            let day_model = RangeModel::new(1, 31);
 
-            day_section.set_min(1);
-            day_section.set_max(31);
-
-            day_section.set_width_request(40);
-
-            let day_formatter = Formatter::new(|day| format!("{:02}", day));
-
-            day_section.set_formatter(day_formatter);
-
+            let day_section = Section::new(day_model, 5);
             day_section.set_parent(widget);
 
-            let day_updater = clone!(@weak year_section, @weak month_section, @weak day_section => move |_: &Section| {
-                let year = year_section.selected();
-                let month = month_section.selected();
+            let license_model = adw::EnumListModel::new(gtk::License::static_type());
 
-                let month = glib::DateMonth::__Unknown(month as i32 + 1);
+            let license_section = Section::new(license_model, 15);
+            license_section.set_parent(widget);
 
-                let day_count = glib::Date::days_in_month(month, year as u16);
+            // let day_updater = clone!(@weak year_section, @weak month_section, @weak day_section => move |_: &Section| {
+            //     let year = year_section.selected();
+            //     let month = month_section.selected();
 
-                day_section.set_max(day_count as i64);
-            });
+            //     let month = glib::DateMonth::__Unknown(month as i32 + 1);
 
-            month_section.connect_selected_notify(day_updater.clone());
-            year_section.connect_selected_notify(day_updater.clone());
+            //     let day_count = glib::Date::days_in_month(month, year as u16);
 
-            year_section.set_margin_start(24);
-            day_section.set_margin_end(24);
+            //     day_section.set_max(day_count as i64);
+            // });
+
+            // month_section.connect_selected_notify(day_updater.clone());
+            // year_section.connect_selected_notify(day_updater.clone());
+
+            // year_section.set_margin_start(24);
+            // day_section.set_margin_end(24);
         }
     }
 
