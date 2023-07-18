@@ -1,6 +1,7 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::clone;
+use gtk::gio;
 use gtk::glib;
 use gtk::graphene;
 use gtk::gsk;
@@ -15,16 +16,7 @@ mod imp {
     #[derive(Default, glib::Properties)]
     #[properties(wrapper_type = super::Section)]
     pub struct Section {
-        children: [gtk::Button; 5],
-
-        #[property(get, set = Self::set_min)]
-        pub(super) min: Cell<i64>,
-
-        #[property(get, set = Self::set_max)]
-        pub(super) max: Cell<i64>,
-
-        #[property(get, set = Self::set_selected)]
-        pub(super) selected: Cell<i64>,
+        pub(super) children: [gtk::Button; 7],
 
         pub(super) active_shift: Cell<f64>,
 
@@ -33,8 +25,23 @@ mod imp {
         pub(super) deceleration_animation: OnceCell<adw::SpringAnimation>,
         pub(super) deceleration_progress: Cell<f64>,
 
+        #[property(get, set = Self::set_width_chars)]
+        pub(super) width_chars: Cell<i32>,
+
+        #[property(get, set = Self::set_selected)]
+        pub(super) selected: Cell<i64>,
+
+        #[property(get, set = Self::set_wrap)]
+        pub(super) wrap: Cell<bool>,
+
         #[property(get, set)]
         pub(super) formatter: RefCell<Formatter>,
+
+        #[property(get, set)]
+        pub(super) model: RefCell<Option<gio::ListModel>>,
+
+        #[property(get, set, nullable)]
+        pub(super) expression: RefCell<Option<gtk::Expression>>,
     }
 
     #[glib::object_subclass]
@@ -166,6 +173,15 @@ mod imp {
             self.refresh_inscriptions();
         }
 
+        fn measure(&self, orientation: gtk::Orientation, _for_size: i32) -> (i32, i32, i32, i32) {
+            if orientation == gtk::Orientation::Horizontal {
+                let width = self.width_pixels();
+                (width, width, -1, -1)
+            } else {
+                (-1, -1, -1, -1)
+            }
+        }
+
         fn size_allocate(&self, width: i32, height: i32, _baseline: i32) {
             fn transform_for_position(position: f64) -> gsk::Transform {
                 let position = position as f32;
@@ -200,17 +216,30 @@ mod imp {
 
             let new_selected = imp.selected.get() - new_shift as i64;
 
-            let min = imp.min.get();
-            let max = imp.max.get();
+            let count = imp
+                .model
+                .borrow()
+                .as_ref()
+                .map(|m| m.n_items())
+                .unwrap_or_default() as i64;
 
-            let selected = new_selected.max(min).min(max);
+            if self.wrap.get() {
+                let selected = new_selected.rem_euclid(count);
 
-            widget.set_selected(selected);
+                widget.set_selected(selected);
 
-            if selected == min && new_shift >= 0.0 || selected == max && new_shift <= 0.0 {
-                imp.active_shift.set(0.0);
-            } else {
                 imp.active_shift.set(new_shift % 1.0);
+            } else {
+                let max = count - 1;
+                let selected = new_selected.max(0).min(max);
+
+                widget.set_selected(selected);
+
+                if selected == 0 && new_shift >= 0.0 || selected == max && new_shift <= 0.0 {
+                    imp.active_shift.set(0.0);
+                } else {
+                    imp.active_shift.set(new_shift % 1.0);
+                }
             }
 
             widget.queue_allocate();
@@ -227,23 +256,15 @@ mod imp {
             self.refresh_inscriptions();
         }
 
-        fn set_min(&self, value: i64) {
-            self.min.set(value);
-
-            if self.selected.get() < value {
-                self.obj().set_selected(value);
-            } else {
+        fn set_wrap(&self, value: bool) {
+            if self.wrap.replace(value) != value {
                 self.refresh_inscriptions();
             }
         }
 
-        fn set_max(&self, value: i64) {
-            self.max.set(value);
-
-            if self.selected.get() > value {
-                self.obj().set_selected(value);
-            } else {
-                self.refresh_inscriptions();
+        fn set_width_chars(&self, value: i32) {
+            if self.width_chars.replace(value) != value {
+                self.obj().queue_resize();
             }
         }
 
@@ -251,19 +272,49 @@ mod imp {
             let value = self.selected.get();
 
             for (i, child) in self.children.iter().enumerate() {
-                let child_index = i;
-
                 let i = self.convert_position(i);
 
                 let index = i + value;
 
-                if index < self.min.get() || index > self.max.get() {
-                    child.set_visible(false);
-                } else {
-                    let string = self.formatter.borrow().format(index);
-                    child.set_visible(true);
+                if let Some(model) = &*self.model.borrow() {
+                    let index = if self.wrap.get() {
+                        index.rem_euclid(model.n_items() as i64)
+                    } else {
+                        index
+                    };
 
-                    child.set_label(&format!("{child_index}: {string}"));
+                    if index < 0 {
+                        child.set_visible(false);
+                    } else {
+                        if let Some(item) = model.item(index as u32) {
+                            child.set_visible(true);
+
+                            if let Some(expression) = &*self.expression.borrow() {
+                                let label: String =
+                                    expression.evaluate(Some(&item)).unwrap().get().unwrap();
+
+                                child.set_label(&label);
+                            } else {
+                                if item.has_property("string", Some(glib::GString::static_type())) {
+                                    let label: String = item.property("string");
+                                    child.set_label(&label)
+                                } else if let Some(label) =
+                                    item.downcast_ref::<adw::EnumListItem>().map(|i| i.nick())
+                                {
+                                    child.set_label(&label)
+                                } else {
+                                    eprintln!("{} is unsupported by OriWheelSection. Custom expression is required", item.type_());
+                                    child.set_visible(false);
+                                }
+                            }
+                        } else {
+                            child.set_visible(false);
+                        }
+                    }
+                } else {
+                    // child.set_visible(false);
+
+                    child.set_label("Model is required");
                 }
             }
 
@@ -273,7 +324,9 @@ mod imp {
 
         #[inline]
         fn convert_position(&self, index: usize) -> i64 {
-            (index as i64 - self.selected.get()).rem_euclid(5) - 2
+            let child_count = self.children.len() as i64;
+            let pos_shift = child_count / 2;
+            (index as i64 - self.selected.get()).rem_euclid(child_count) - pos_shift
         }
 
         fn pause_snap(&self) {
@@ -292,6 +345,18 @@ mod imp {
             animation.set_value_from(from);
             animation.play();
         }
+
+        fn width_pixels(&self) -> i32 {
+            let metrics = self.obj().pango_context().metrics(None, None);
+
+            let char_width = metrics
+                .approximate_char_width()
+                .max(metrics.approximate_digit_width());
+
+            let width = char_width * self.width_chars.get();
+
+            width / gtk::pango::SCALE
+        }
     }
 }
 
@@ -301,7 +366,14 @@ glib::wrapper! {
 }
 
 impl Section {
-    pub fn new() -> Self {
-        glib::Object::new()
+    pub fn new<M>(model: M, width_chars: i32) -> Self
+    where
+        M: IsA<gio::ListModel>,
+    {
+        let model: gio::ListModel = model.upcast();
+        glib::Object::builder()
+            .property("model", model)
+            .property("width-chars", width_chars)
+            .build()
     }
 }
