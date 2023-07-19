@@ -41,6 +41,10 @@ mod imp {
 
             widget.set_halign(gtk::Align::Center);
 
+            // let selection_indicator = crate::ColorNode::new("selectionindicator");
+
+            // selection_indicator.set_parent(widget);
+
             // let year_section = Section::new();
 
             // // year_section.set_min(1960);
@@ -145,7 +149,22 @@ mod imp {
             let clip_bounds =
                 &graphene::Rect::new(0.0, (height - wheel_height) * 0.5, width, wheel_height);
 
+            let selection_bounds =
+                graphene::Rect::new(0.0, (height * 0.5 - 20.0).round(), width, 40.0);
+
+            let mut color = widget.color();
+
+            color.set_alpha(0.1);
+
+            snapshot.push_rounded_clip(&gsk::RoundedRect::from_rect(selection_bounds, 8.0));
+
+            snapshot.append_color(&color, &selection_bounds);
+
+            snapshot.pop();
+
             snapshot.push_mask(gsk::MaskMode::Alpha);
+
+            let semi_trasparent = gdk::RGBA::new(1.0, 1.0, 1.0, 0.6);
 
             snapshot.append_linear_gradient(
                 &clip_bounds,
@@ -153,29 +172,19 @@ mod imp {
                 &clip_bounds.bottom_left(),
                 &[
                     gsk::ColorStop::new(0.0, gdk::RGBA::TRANSPARENT),
-                    gsk::ColorStop::new(0.1, gdk::RGBA::WHITE),
-                    gsk::ColorStop::new(0.9, gdk::RGBA::WHITE),
+                    gsk::ColorStop::new(0.1, semi_trasparent),
+                    gsk::ColorStop::new(0.9, semi_trasparent),
                     gsk::ColorStop::new(1.0, gdk::RGBA::TRANSPARENT),
                 ],
             );
+
+            snapshot.append_color(&gdk::RGBA::WHITE, &selection_bounds);
 
             snapshot.pop(); // mask 1
 
             self.parent_snapshot(snapshot);
 
             snapshot.pop(); // mask 2
-
-            let mut color = widget.color();
-
-            color.set_alpha(0.1);
-
-            let selection_bounds = graphene::Rect::new(0.0, height * 0.5 - 20.0, width, 40.0);
-
-            snapshot.push_rounded_clip(&gsk::RoundedRect::from_rect(selection_bounds, 8.0));
-
-            snapshot.append_color(&color, &selection_bounds);
-
-            snapshot.pop();
         }
     }
 }

@@ -110,23 +110,19 @@ mod imp {
             key_controller.connect_key_pressed(move |controller, key, _, _| {
                 let widget = controller.widget().downcast::<Self::Type>().unwrap();
 
+                let imp = widget.imp();
+
                 let shift = if key == gdk::Key::Up {
-                    -1.0
+                    -1
                 } else if key == gdk::Key::Down {
-                    1.0
+                    1
                 } else {
                     return gtk::Inhibit(false);
                 };
 
-                let imp = widget.imp();
+                widget.set_selected(imp.selected.get() + shift);
 
-                let animation = imp.deceleration_animation.get().unwrap();
-
-                imp.deceleration_progress.take();
-                animation.set_value_to(shift);
-                animation.play();
-
-                gtk::Inhibit(true)
+                gtk::Inhibit(false)
             });
 
             widget.add_controller(key_controller);
@@ -271,30 +267,18 @@ mod imp {
 
             let new_selected = imp.selected.get() - new_shift as i64;
 
-            let count = imp
-                .model
-                .borrow()
-                .as_ref()
-                .map(|m| m.n_items())
-                .unwrap_or_default() as i64;
+            let selected = self.wrap_or_clamp_selected(new_selected);
 
-            if self.wrap.get() {
-                let selected = new_selected.rem_euclid(count);
+            widget.set_selected(selected);
 
-                widget.set_selected(selected);
+            let ignore_scroll = !self.wrap.get()
+                && (selected == 0 && new_shift >= 0.0
+                    || selected == self.item_count() - 1 && new_shift <= 0.0);
 
-                imp.active_shift.set(new_shift % 1.0);
+            if ignore_scroll {
+                imp.active_shift.take();
             } else {
-                let max = count - 1;
-                let selected = new_selected.max(0).min(max);
-
-                widget.set_selected(selected);
-
-                if selected == 0 && new_shift >= 0.0 || selected == max && new_shift <= 0.0 {
-                    imp.active_shift.set(0.0);
-                } else {
-                    imp.active_shift.set(new_shift % 1.0);
-                }
+                imp.active_shift.set(new_shift % 1.0);
             }
 
             widget.queue_allocate();
@@ -306,9 +290,11 @@ mod imp {
                 return;
             }
 
-            self.selected.set(value);
+            let value = self.wrap_or_clamp_selected(value);
 
-            self.refresh_inscriptions();
+            if self.selected.replace(value) != value {
+                self.refresh_inscriptions();
+            }
         }
 
         fn set_wrap(&self, value: bool) {
@@ -399,6 +385,23 @@ mod imp {
 
             animation.set_value_from(from);
             animation.play();
+        }
+
+        fn item_count(&self) -> i64 {
+            if let Some(model) = &*self.model.borrow() {
+                model.n_items() as i64
+            } else {
+                0
+            }
+        }
+
+        fn wrap_or_clamp_selected(&self, selected: i64) -> i64 {
+            let count = self.item_count();
+            if self.wrap.get() {
+                selected.rem_euclid(count)
+            } else {
+                selected.clamp(0, count - 1)
+            }
         }
 
         fn width_pixels(&self) -> i32 {
