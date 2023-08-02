@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use super::*;
 
 use adw::prelude::*;
@@ -238,6 +240,7 @@ mod imp {
 }
 
 glib::wrapper! {
+    #[deprecated(note = "upcoming libadwaita 1.4 breakpoints disable animations on layout change, just use Group")]
     pub struct AnimatedGroup(ObjectSubclass<imp::AnimatedGroup>)
         @extends gtk::Widget, @implements gtk::Buildable;
 }

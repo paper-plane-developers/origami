@@ -8,18 +8,18 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate)]
-    #[template(file = "src/window/animated_group/animated_group.blp")]
-    pub struct AnimatedGroupPage {
+    #[template(file = "src/window/picture_group/picture_group.blp")]
+    pub struct PictureGroupPage {
         #[template_child]
-        pub(super) group: TemplateChild<ori::AnimatedGroup>,
+        pub(super) group: TemplateChild<ori::Group>,
         #[template_child]
         pub(super) drop_target: TemplateChild<gtk::DropTarget>,
     }
 
     #[glib::object_subclass]
-    impl ObjectSubclass for AnimatedGroupPage {
-        const NAME: &'static str = "OriDemoAnimatedGroupPage";
-        type Type = super::AnimatedGroupPage;
+    impl ObjectSubclass for PictureGroupPage {
+        const NAME: &'static str = "OriDemoPictureGroupPage";
+        type Type = super::PictureGroupPage;
         type ParentType = adw::Bin;
 
         fn class_init(klass: &mut Self::Class) {
@@ -31,7 +31,7 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for AnimatedGroupPage {
+    impl ObjectImpl for PictureGroupPage {
         fn constructed(&self) {
             self.parent_constructed();
 
@@ -51,11 +51,13 @@ mod imp {
                             .build()
                         });
 
-                        imp.group.remove_chldren();
+                        imp.group.replace_children(pictures);
 
-                        pictures.for_each(|pic| {
-                            imp.group.append(&pic);
-                        });
+                        // imp.group.remove_children();
+
+                        // pictures.for_each(|pic| {
+                        //     imp.group.append(&pic);
+                        // });
 
                         true
                     }
@@ -63,11 +65,11 @@ mod imp {
             );
         }
     }
-    impl WidgetImpl for AnimatedGroupPage {}
-    impl BinImpl for AnimatedGroupPage {}
+    impl WidgetImpl for PictureGroupPage {}
+    impl BinImpl for PictureGroupPage {}
 }
 
 glib::wrapper! {
-    pub struct AnimatedGroupPage(ObjectSubclass<imp::AnimatedGroupPage>)
+    pub struct PictureGroupPage(ObjectSubclass<imp::PictureGroupPage>)
         @extends gtk::Widget;
 }

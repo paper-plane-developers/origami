@@ -1,22 +1,18 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $OriDemoAnimatedGroupPage: Adw.Bin {
+template $OriDemoPictureGroupPage: Adw.Bin {
     child: Adw.StatusPage {
         DropTarget drop_target {
             actions: copy;
             formats: "GdkFileList";
         }
         
-        title: "Animated Group";
-        description: "Resize window to check how it works";
+        title: "Picture Group";
+        description: "Drop pictures here";
 
-        Box {
-            homogeneous: true;
-
-            Adw.Bin {}
-
-            $OriAnimatedGroup group {
+        Adw.Clamp {
+            child: $OriGroup group {
                 Adw.Bin {
                     styles ["card"]
 
@@ -58,9 +54,7 @@ template $OriDemoAnimatedGroupPage: Adw.Bin {
                     width-request: 6;
                     height-request: 8;
                 }
-            }
-
-            Adw.Bin {}
+            };
         }
     };
 }

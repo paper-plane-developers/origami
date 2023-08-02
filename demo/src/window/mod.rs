@@ -1,6 +1,6 @@
-mod animated_group;
 mod group;
 mod loading_indicator;
+mod picture_group;
 mod shimmer_effect;
 mod spoiler;
 
@@ -36,7 +36,7 @@ mod imp {
             shimmer_effect::ShimmerEffectPage::static_type();
             spoiler::SpoilerPage::static_type();
             group::GroupPage::static_type();
-            animated_group::AnimatedGroupPage::static_type();
+            picture_group::PictureGroupPage::static_type();
 
             klass.bind_template();
             klass.bind_template_callbacks();

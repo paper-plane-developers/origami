@@ -187,4 +187,25 @@ glib::wrapper! {
         @extends gtk::Widget;
 }
 
-impl Group {}
+impl Group {
+    pub fn remove_children(&self) {
+        while let Some(child) = self.first_child() {
+            child.unparent();
+        }
+    }
+
+    pub fn append(&self, child: &impl IsA<gtk::Widget>) {
+        child.insert_before(self, gtk::Widget::NONE);
+    }
+
+    pub fn replace_children<I, W>(&self, children: I)
+    where
+        I: IntoIterator<Item = W>,
+        W: IsA<gtk::Widget>,
+    {
+        self.remove_children();
+        for child in children {
+            self.append(&child);
+        }
+    }
+}
