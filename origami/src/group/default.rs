@@ -2,6 +2,7 @@ use super::*;
 
 use adw::prelude::*;
 use gtk::glib;
+use gtk::glib::translate::ToGlibPtr;
 use gtk::subclass::prelude::*;
 
 mod imp {
@@ -39,6 +40,10 @@ mod imp {
         fn set_property(&self, id: usize, value: &glib::Value, pspec: &glib::ParamSpec) {
             self.derived_set_property(id, value, pspec)
         }
+
+        fn dispose(&self) {
+            self.obj().remove_children();
+        }
     }
 
     impl WidgetImpl for Group {
@@ -49,7 +54,7 @@ mod imp {
 
             let widget = self.obj();
 
-            if widget.observe_children().n_items() <= 1 {
+            if self.less_than_two_children() {
                 return if let Some(child) = widget.first_child() {
                     child.measure(orientation, for_size)
                 } else {
@@ -65,9 +70,7 @@ mod imp {
                         widget.spacing() as f32,
                     );
 
-                    let animated_layout = { layout };
-
-                    animated_layout
+                    layout
                         .iter()
                         .map(|c| {
                             let lf = c.layout_frame.get();
@@ -97,47 +100,6 @@ mod imp {
             (min, size, -1, -1)
         }
 
-        // fn measure(&self, orientation: gtk::Orientation, for_size: i32) -> (i32, i32, i32, i32) {
-        //     if for_size >= 1000000 {
-        //         return (-1, -1, -1, -1);
-        //     }
-
-        //     let widget = self.obj();
-
-        //     if widget.observe_children().n_items() <= 1 {
-        //         return if let Some(child) = widget.first_child() {
-        //             child.measure(orientation, for_size)
-        //         } else {
-        //             (0, 0, -1, -1)
-        //         };
-        //     }
-
-        //     let (min, size) = if orientation == gtk::Orientation::Vertical {
-        //         let height = shared::measure_height(
-        //             widget.as_ref().upcast_ref(),
-        //             for_size,
-        //             widget.spacing() as f32,
-        //         );
-        //         self.widths.borrow_mut().insert(height, for_size);
-
-        //         (height, height)
-        //     } else {
-        //         let size = if for_size == -1 {
-        //             270
-        //         } else {
-        //             *self.widths.borrow_mut().get(&for_size).unwrap_or(&1)
-        //         };
-
-        //         if size == -1 {
-        //             (-1, -1)
-        //         } else {
-        //             (64, size.max(64))
-        //         }
-        //     };
-
-        //     (min, size, -1, -1)
-        // }
-
         fn request_mode(&self) -> gtk::SizeRequestMode {
             gtk::SizeRequestMode::HeightForWidth
         }
@@ -145,7 +107,7 @@ mod imp {
         fn size_allocate(&self, width: i32, height: i32, baseline: i32) {
             let widget = self.obj();
 
-            if widget.observe_children().n_items() <= 1 {
+            if self.less_than_two_children() {
                 if let Some(child) = widget.first_child() {
                     child.allocate(width, height, baseline, None);
                 }
@@ -178,6 +140,14 @@ mod imp {
         fn set_spacing(&self, spacing: i32) {
             self.spacing.set(spacing);
             self.obj().queue_allocate();
+        }
+
+        fn less_than_two_children(&self) -> bool {
+            if let Some(first) = self.obj().first_child() {
+                first.next_sibling().is_none()
+            } else {
+                true
+            }
         }
     }
 }

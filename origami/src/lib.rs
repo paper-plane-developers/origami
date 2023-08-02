@@ -7,7 +7,7 @@ mod loading_indicator;
 mod shimmer_effect;
 mod spoiler_overlay;
 
-pub use group::*;
+pub use group::Group;
 use gtk::prelude::StaticType;
 pub use loading_indicator::LoadingIndicator;
 pub use shimmer_effect::ShimmerEffect;
@@ -17,7 +17,6 @@ pub use spoiler_overlay::SpoilerOverlay;
 ///
 /// Expected to be called in the main function
 pub fn init() {
-    AnimatedGroup::static_type();
     Group::static_type();
     LoadingIndicator::static_type();
     ShimmerEffect::static_type();

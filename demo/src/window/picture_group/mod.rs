@@ -53,12 +53,6 @@ mod imp {
 
                         imp.group.replace_children(pictures);
 
-                        // imp.group.remove_children();
-
-                        // pictures.for_each(|pic| {
-                        //     imp.group.append(&pic);
-                        // });
-
                         true
                     }
                 ),
