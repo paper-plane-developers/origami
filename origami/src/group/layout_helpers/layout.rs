@@ -6,13 +6,7 @@ const MIN_WIDTH: f32 = 70.0;
 pub(crate) fn layout_function(
     child_count: usize,
     force_calc: bool,
-) -> fn(
-    children: &[ChildWrapper],
-    proportions: &str,
-    average_aspect_ratio: f32,
-    width: f32,
-    spacing: f32,
-) {
+) -> fn(children: &[ChildWrapper], proportions: &str, average_aspect_ratio: f32, width: f32) {
     if force_calc {
         layout_fallback
     } else {
@@ -30,7 +24,6 @@ fn layout_two_children(
     proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
-    spacing: f32,
 ) {
     let [child_0, child_1]: &[_; 2] = children.try_into().unwrap();
 
@@ -48,27 +41,26 @@ fn layout_two_children(
         layout_frame_0 = (0.0, 0.0, width, height);
         position_flags_0 = PositionFlags::TOP | PositionFlags::FULL_WIDTH;
 
-        layout_frame_1 = (0.0, height + spacing, width, height);
+        layout_frame_1 = (0.0, height, width, height);
         position_flags_1 = PositionFlags::BOTTOM | PositionFlags::FULL_WIDTH;
     } else if matches!(proportions, "ww" | "qq") {
-        let width = (width - spacing) * 0.5;
+        let width = (width) * 0.5;
         let height = (width / aspect_ratio_0).min(width / aspect_ratio_1);
 
         layout_frame_0 = (0.0, 0.0, width, height);
         position_flags_0 = PositionFlags::LEFT | PositionFlags::FULL_HEIGHT;
-        layout_frame_1 = (width + spacing, 0.0, width, height);
+        layout_frame_1 = (width, 0.0, width, height);
         position_flags_1 = PositionFlags::RIGHT | PositionFlags::FULL_HEIGHT;
     } else {
-        let first_width = (width - spacing)
-            / child_1.aspect_ratio
-            / (1.0 / aspect_ratio_0 + 1.0 / aspect_ratio_1);
-        let second_width = width - first_width - spacing;
+        let first_width =
+            (width) / child_1.aspect_ratio / (1.0 / aspect_ratio_0 + 1.0 / aspect_ratio_1);
+        let second_width = width - first_width;
 
         let height = (first_width / aspect_ratio_0).min(second_width / aspect_ratio_1);
 
         layout_frame_0 = (0.0, 0.0, first_width, height);
         position_flags_0 = PositionFlags::LEFT | PositionFlags::FULL_HEIGHT;
-        layout_frame_1 = (first_width + spacing, 0.0, second_width, height);
+        layout_frame_1 = (first_width, 0.0, second_width, height);
         position_flags_1 = PositionFlags::RIGHT | PositionFlags::FULL_HEIGHT;
     };
 
@@ -83,7 +75,6 @@ fn layout_three_children(
     proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
-    spacing: f32,
 ) {
     let [child_0, child_1, child_2]: &[_; 3] = children.try_into().unwrap();
 
@@ -105,11 +96,11 @@ fn layout_three_children(
     if proportions.starts_with('n') {
         let first_height = height;
 
-        let third_height = ((height - spacing) * 0.5)
-            .min((aspect_ratio_1 * (width - spacing) / (aspect_ratio_2 + aspect_ratio_0)).round());
-        let second_height = height - third_height - spacing;
+        let third_height = ((height) * 0.5)
+            .min((aspect_ratio_1 * (width) / (aspect_ratio_2 + aspect_ratio_0)).round());
+        let second_height = height - third_height;
 
-        let right_width = ((width - spacing) * 0.5)
+        let right_width = ((width) * 0.5)
             .min(
                 (third_height * aspect_ratio_2)
                     .min(second_height * aspect_ratio_1)
@@ -118,31 +109,24 @@ fn layout_three_children(
             .max(MIN_WIDTH);
 
         let left_width = (first_height * aspect_ratio_0)
-            .min(width - spacing - right_width)
+            .min(width - right_width)
             .round();
 
         layout_frame_0 = (0.0, 0.0, left_width, first_height);
         position_flags_0 = PositionFlags::LEFT | PositionFlags::FULL_HEIGHT;
 
-        layout_frame_1 = (left_width + spacing, 0.0, right_width, second_height);
+        layout_frame_1 = (left_width, 0.0, right_width, second_height);
         position_flags_1 = PositionFlags::TOP_RIGHT;
 
-        layout_frame_2 = (
-            left_width + spacing,
-            second_height + spacing,
-            right_width,
-            third_height,
-        );
+        layout_frame_2 = (left_width, second_height, right_width, third_height);
         position_flags_2 = PositionFlags::BOTTOM_RIGHT;
     } else {
         let width = width;
-        let first_height = (width / aspect_ratio_0)
-            .min((height - spacing) * 0.66)
-            .floor();
+        let first_height = (width / aspect_ratio_0).min((height) * 0.66).floor();
 
-        let half_width = (width - spacing) * 0.5;
+        let half_width = (width) * 0.5;
 
-        let second_height = (height - first_height - spacing).min(
+        let second_height = (height - first_height).min(
             (half_width / aspect_ratio_1)
                 .min(half_width / aspect_ratio_2)
                 .round(),
@@ -151,15 +135,10 @@ fn layout_three_children(
         layout_frame_0 = (0.0, 0.0, width, first_height);
         position_flags_0 = PositionFlags::TOP | PositionFlags::FULL_WIDTH;
 
-        layout_frame_1 = (0.0, first_height + spacing, half_width, second_height);
+        layout_frame_1 = (0.0, first_height, half_width, second_height);
         position_flags_1 = PositionFlags::BOTTOM_LEFT;
 
-        layout_frame_2 = (
-            half_width + spacing,
-            first_height + spacing,
-            half_width,
-            second_height,
-        );
+        layout_frame_2 = (half_width, first_height, half_width, second_height);
 
         position_flags_2 = PositionFlags::BOTTOM_RIGHT;
     };
@@ -177,7 +156,6 @@ fn layout_four_children(
     proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
-    spacing: f32,
 ) {
     let [child_0, child_1, child_2, child_3]: &[_; 4] = children.try_into().unwrap();
 
@@ -205,10 +183,10 @@ fn layout_four_children(
         layout_frame_0 = (0.0, 0.0, w, h0);
         position_flags_0 = PositionFlags::TOP | PositionFlags::FULL_WIDTH;
 
-        let h = (width - 2.0 * spacing) / (aspect_ratio_1 + aspect_ratio_2 + aspect_ratio_3);
-        let w0 = ((width - 2.0 * spacing) * 0.33).max(h * aspect_ratio_1);
-        let w2 = ((width - 2.0 * spacing) * 0.33).max(h * aspect_ratio_3);
-        let w1 = w - w0 - w2 - 2.0 * spacing;
+        let h = (width - 2.0) / (aspect_ratio_1 + aspect_ratio_2 + aspect_ratio_3);
+        let w0 = ((width - 2.0) * 0.33).max(h * aspect_ratio_1);
+        let w2 = ((width - 2.0) * 0.33).max(h * aspect_ratio_3);
+        let w1 = w - w0 - w2 - 2.0;
 
         let (w1, w2) = if w1 < MIN_WIDTH {
             (MIN_WIDTH, w2 - MIN_WIDTH - w1)
@@ -216,43 +194,38 @@ fn layout_four_children(
             (w1, w2)
         };
 
-        layout_frame_1 = (0.0, h0 + spacing, w0, h);
+        layout_frame_1 = (0.0, h0, w0, h);
         position_flags_1 = PositionFlags::BOTTOM_LEFT;
 
-        layout_frame_2 = (w0 + spacing, h0 + spacing, w1, h);
+        layout_frame_2 = (w0, h0, w1, h);
         position_flags_2 = PositionFlags::BOTTOM;
 
-        layout_frame_3 = (w0 + w1 + 2.0 * spacing, h0 + spacing, w2, h);
+        layout_frame_3 = (w0 + w1 + 2.0, h0, w2, h);
         position_flags_3 = PositionFlags::BOTTOM_RIGHT;
     } else {
         let height = width / average_aspect_ratio;
 
         let h: f32 = height;
-        let left_width: f32 = f32::min(h * aspect_ratio_0, (width - spacing) * 0.6);
+        let left_width: f32 = f32::min(h * aspect_ratio_0, (width) * 0.6);
         layout_frame_0 = (0.0, 0.0, left_width, h);
         position_flags_0 = PositionFlags::LEFT | PositionFlags::FULL_HEIGHT;
 
-        let w: f32 = (height - 2.0 * spacing)
-            / (1.0 / aspect_ratio_1 + 1.0 / aspect_ratio_2 + 1.0 / aspect_ratio_3);
+        let w: f32 =
+            (height - 2.0) / (1.0 / aspect_ratio_1 + 1.0 / aspect_ratio_2 + 1.0 / aspect_ratio_3);
 
         let h0: f32 = w / aspect_ratio_1;
         let h1: f32 = w / aspect_ratio_2;
         let h2: f32 = w / aspect_ratio_3;
 
-        let right_width = width - left_width - spacing;
+        let right_width = width - left_width;
 
-        layout_frame_1 = (left_width + spacing, 0.0, right_width, h0);
+        layout_frame_1 = (left_width, 0.0, right_width, h0);
         position_flags_1 = PositionFlags::TOP_RIGHT;
 
-        layout_frame_2 = (left_width + spacing, h0 + spacing, right_width, h1);
+        layout_frame_2 = (left_width, h0, right_width, h1);
         position_flags_2 = PositionFlags::RIGHT;
 
-        layout_frame_3 = (
-            left_width + spacing,
-            h0 + h1 + 2.0 * spacing,
-            right_width,
-            h2,
-        );
+        layout_frame_3 = (left_width, h0 + h1 + 2.0, right_width, h2);
         position_flags_3 = PositionFlags::BOTTOM_RIGHT;
     };
 
@@ -271,7 +244,6 @@ fn layout_fallback(
     _proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
-    spacing: f32,
 ) {
     struct GroupedLayoutAttempt {
         line_counts: Vec<usize>,
@@ -291,7 +263,7 @@ fn layout_fallback(
 
     let multi_height = |ratios: &[f32]| {
         let ratio_sum: f32 = ratios.iter().sum();
-        (width - (ratios.len() as f32 - 1.0) * spacing) / ratio_sum
+        (width - (ratios.len() as f32 - 1.0)) / ratio_sum
     };
 
     let mut attempts = vec![];
@@ -383,7 +355,7 @@ fn layout_fallback(
     let mut optimal_diff = f32::MAX;
 
     for attempt in attempts {
-        let mut total_height = spacing * (attempt.heights.len() - 1) as f32;
+        let mut total_height = 0.0;
         let mut min_line_height = f32::MAX;
         let mut max_line_height = 0.0;
 
@@ -454,10 +426,10 @@ fn layout_fallback(
             children[index].layout_frame.set((x, y, width, line_height));
             children[index].position_flags.set(inner_position_flags);
 
-            x += width + spacing;
+            x += width;
             index += 1
         }
 
-        y += line_height + spacing;
+        y += line_height;
     }
 }

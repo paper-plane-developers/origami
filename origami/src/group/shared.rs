@@ -26,13 +26,24 @@ pub(super) fn layout(widget: &gtk::Widget, width: i32, spacing: f32) -> Vec<Chil
 
     let width = width as f32;
 
-    layout_function(
-        &children,
-        &proportions,
-        average_aspect_ratio,
-        width,
-        spacing,
-    );
+    // TODO: apply spacing
+    _ = spacing;
+
+    {
+        let width = 480.0;
+        layout_function(&children, &proportions, average_aspect_ratio, width);
+    }
+
+    let scale = width / 480.0;
+
+    for child in &children {
+        let mut frame = child.layout_frame.get();
+        frame.0 *= scale;
+        frame.1 *= scale;
+        frame.2 *= scale;
+        frame.3 *= scale;
+        child.layout_frame.set(frame);
+    }
 
     children
 }

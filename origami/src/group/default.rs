@@ -92,7 +92,7 @@ mod imp {
                 if size == -1 {
                     (-1, -1)
                 } else {
-                    (64, size.max(64))
+                    (64, size.max(64).min(480))
                 }
             };
 
