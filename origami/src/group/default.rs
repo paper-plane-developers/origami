@@ -2,7 +2,6 @@ use super::*;
 
 use adw::prelude::*;
 use gtk::glib;
-use gtk::glib::translate::ToGlibPtr;
 use gtk::subclass::prelude::*;
 
 mod imp {

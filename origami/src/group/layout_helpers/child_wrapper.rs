@@ -16,24 +16,21 @@ pub(crate) struct ChildWrapper {
 
 impl ChildWrapper {
     pub fn new(widget: gtk::Widget) -> Self {
-        let (_min, natural) = widget.preferred_size();
+        let aspect_ratio = if widget.has_property("aspect-ratio", Some(f32::static_type())) {
+            // get rid of the warning
+            _ = widget.measure(gtk::Orientation::Vertical, -1);
+            widget.property("aspect-ratio")
+        } else {
+            let (_min, natural) = widget.preferred_size();
 
-        let aspect_ratio = natural.width().max(1) as f32 / natural.height().max(1) as f32;
+            natural.width().max(1) as f32 / natural.height().max(1) as f32
+        };
 
         Self {
             widget,
             aspect_ratio,
             layout_frame: Cell::default(),
             position_flags: Default::default(),
-        }
-    }
-
-    pub fn from_result<T>(res: Result<glib::Object, T>) -> Option<Self> {
-        let widget = res.ok()?.downcast::<gtk::Widget>().ok()?;
-        if widget.is_visible() {
-            Some(Self::new(widget))
-        } else {
-            None
         }
     }
 
