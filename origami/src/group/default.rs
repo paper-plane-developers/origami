@@ -46,6 +46,10 @@ mod imp {
 
     impl WidgetImpl for Group {
         fn measure(&self, orientation: gtk::Orientation, for_size: i32) -> (i32, i32, i32, i32) {
+            if for_size > 1 << 16 {
+                return (-1, -1, -1, -1);
+            }
+
             let widget = self.obj();
 
             if self.less_than_two_children() {
@@ -86,7 +90,7 @@ mod imp {
             } as i32;
 
             if orientation == gtk::Orientation::Vertical {
-                (size, size, -1, -1)
+                (-1, size, -1, -1)
             } else {
                 (0, size, -1, -1)
             }
