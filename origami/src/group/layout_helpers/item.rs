@@ -61,6 +61,12 @@ impl LayoutItem {
             height -= half_spacing;
         }
 
+        // Otherwise values would be rounded wrong way
+        shift_x = shift_x.round();
+        shift_y = shift_y.round();
+        width = width.round();
+        height = height.round();
+
         // Remove classes
         for class in ["left", "top", "right", "bottom"] {
             widget.remove_css_class(class);
