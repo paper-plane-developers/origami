@@ -6,13 +6,16 @@ use gtk::subclass::prelude::*;
 
 mod imp {
     use super::*;
-    use std::cell::Cell;
+    use std::cell::{Cell, RefCell};
 
     #[derive(Default, glib::Properties)]
     #[properties(wrapper_type = default::Group)]
     pub struct Group {
         #[property(get, set = Self::set_spacing)]
         pub(super) spacing: Cell<i32>,
+
+        #[property(get, set)]
+        pub(super) dbg_layout: RefCell<String>,
     }
 
     #[glib::object_subclass]
@@ -105,11 +108,14 @@ mod imp {
             let widget = self.obj();
 
             if self.less_than_two_children() {
+                self.obj().set_dbg_layout("None");
                 if let Some(child) = widget.first_child() {
                     child.allocate(width, height, baseline, None);
                 }
             } else {
                 let layout = shared::layout(widget.as_ref().upcast_ref());
+
+                self.obj().set_dbg_layout(format!("{:?}", layout));
 
                 let scale = width as f32 / 480.0;
                 let spacing = self.spacing.get() as f32;
