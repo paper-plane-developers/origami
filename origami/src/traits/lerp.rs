@@ -7,8 +7,6 @@ impl Lerp<f32> for f32 {
     type Output = Self;
     fn lerp(self, other: Self, t: f32) -> Self {
         self + t * (other - self)
-
-        // self * (1.0 - t) + other * t
     }
 }
 
@@ -16,8 +14,6 @@ impl Lerp<f64> for f64 {
     type Output = Self;
     fn lerp(self, other: Self, t: f64) -> Self {
         self + t * (other - self)
-
-        // self * (1.0 - t) + other * t
     }
 }
 

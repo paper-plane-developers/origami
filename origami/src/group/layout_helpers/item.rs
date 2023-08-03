@@ -4,8 +4,6 @@ use std::cell::Cell;
 use gtk::gsk;
 use gtk::{graphene, prelude::*};
 
-use crate::traits::Lerp;
-
 #[derive(Debug, Clone)]
 pub(crate) struct LayoutItem {
     pub(crate) aspect_ratio: f32,
@@ -95,32 +93,5 @@ impl LayoutItem {
         let transform = gsk::Transform::new().translate(&graphene::Point::new(shift_x, shift_y));
 
         widget.allocate(width as i32, height as i32, -1, Some(transform))
-    }
-}
-
-impl Lerp<f32> for &LayoutItem {
-    type Output = LayoutItem;
-
-    fn lerp(self, other: &LayoutItem, t: f32) -> LayoutItem {
-        let start_frame = self.layout_frame.get();
-        let end_frame = other.layout_frame.get();
-
-        let frame = start_frame.lerp(end_frame, t);
-
-        let res = if t < 0.5 { self.clone() } else { other.clone() };
-
-        res.layout_frame.set(frame);
-        res
-    }
-}
-
-impl Lerp<f32> for &[LayoutItem] {
-    type Output = Vec<LayoutItem>;
-
-    fn lerp(self, other: Self, t: f32) -> Self::Output {
-        self.iter()
-            .zip(other.iter())
-            .map(|(s, e)| s.lerp(e, t))
-            .collect()
     }
 }
