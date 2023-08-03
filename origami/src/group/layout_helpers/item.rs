@@ -46,18 +46,18 @@ impl LayoutItem {
 
         let half_spacing = spacing * 0.5;
 
-        if !pos_flags.contains(PositionFlags::LEFT) {
+        if !pos_flags.at_left() {
             shift_x += half_spacing;
             width -= half_spacing;
         }
-        if !pos_flags.contains(PositionFlags::TOP) {
+        if !pos_flags.at_top() {
             shift_y += half_spacing;
             height -= half_spacing;
         }
-        if !pos_flags.contains(PositionFlags::RIGHT) {
+        if !pos_flags.at_right() {
             width -= half_spacing;
         }
-        if !pos_flags.contains(PositionFlags::BOTTOM) {
+        if !pos_flags.at_bottom() {
             height -= half_spacing;
         }
 
@@ -74,16 +74,16 @@ impl LayoutItem {
 
         let mut classes = [None; 4];
 
-        if pos_flags.contains(PositionFlags::LEFT) {
+        if pos_flags.at_left() {
             classes[0] = Some("left");
         }
-        if pos_flags.contains(PositionFlags::TOP) {
+        if pos_flags.at_top() {
             classes[1] = Some("top");
         }
-        if pos_flags.contains(PositionFlags::RIGHT) {
+        if pos_flags.at_right() {
             classes[2] = Some("right");
         }
-        if pos_flags.contains(PositionFlags::BOTTOM) {
+        if pos_flags.at_bottom() {
             classes[3] = Some("bottom");
         }
 

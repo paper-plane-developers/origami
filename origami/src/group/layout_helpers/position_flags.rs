@@ -1,7 +1,7 @@
 use gtk::glib::bitflags::bitflags;
 
 bitflags! {
-    pub(crate) struct PositionFlags: u32 {
+    pub(crate) struct PositionFlags: u8 {
         const NONE = 0;
         const INSIDE = 0b000010000;
 
@@ -25,5 +25,23 @@ bitflags! {
 impl Default for PositionFlags {
     fn default() -> Self {
         Self::NONE
+    }
+}
+
+impl PositionFlags {
+    pub fn at_top(self) -> bool {
+        self.contains(Self::TOP)
+    }
+
+    pub fn at_right(self) -> bool {
+        self.contains(Self::TOP)
+    }
+
+    pub fn at_bottom(self) -> bool {
+        self.contains(Self::TOP)
+    }
+
+    pub fn at_left(self) -> bool {
+        self.contains(Self::LEFT)
     }
 }
