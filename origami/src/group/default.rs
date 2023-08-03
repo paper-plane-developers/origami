@@ -78,7 +78,7 @@ mod imp {
                 } else {
                     shared::TARGET_WIDTH
                 };
-                return (0, size as i32, -1, -1);
+                return (0, size.round() as i32, -1, -1);
             };
 
             let size = if orientation == gtk::Orientation::Vertical {
@@ -87,10 +87,11 @@ mod imp {
             } else {
                 let heigth = for_size as f32;
                 heigth * aspect_ratio
-            } as i32;
+            }
+            .round() as i32;
 
             if orientation == gtk::Orientation::Vertical {
-                (-1, size, -1, -1)
+                (size, size, -1, -1)
             } else {
                 (0, size, -1, -1)
             }
