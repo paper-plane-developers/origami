@@ -6,18 +6,13 @@ use gtk::subclass::prelude::*;
 
 mod imp {
     use super::*;
-    use std::{
-        cell::{Cell, RefCell},
-        collections::BTreeMap,
-    };
+    use std::cell::Cell;
 
     #[derive(Default, glib::Properties)]
     #[properties(wrapper_type = default::Group)]
     pub struct Group {
         #[property(get, set = Self::set_spacing)]
         pub(super) spacing: Cell<i32>,
-
-        pub(super) widths: RefCell<BTreeMap<i32, i32>>,
     }
 
     #[glib::object_subclass]
@@ -25,6 +20,10 @@ mod imp {
         const NAME: &'static str = "OriGroup";
         type Type = default::Group;
         type ParentType = gtk::Widget;
+
+        fn class_init(klass: &mut Self::Class) {
+            klass.set_css_name("group");
+        }
     }
 
     impl ObjectImpl for Group {
@@ -47,10 +46,6 @@ mod imp {
 
     impl WidgetImpl for Group {
         fn measure(&self, orientation: gtk::Orientation, for_size: i32) -> (i32, i32, i32, i32) {
-            if for_size >= 1000000 {
-                return (-1, -1, -1, -1);
-            }
-
             let widget = self.obj();
 
             if self.less_than_two_children() {
@@ -61,42 +56,40 @@ mod imp {
                 };
             }
 
-            let (min, size) = if orientation == gtk::Orientation::Vertical {
-                let height = {
-                    let layout = shared::layout(
-                        widget.as_ref().upcast_ref(),
-                        for_size,
-                        widget.spacing() as f32,
-                    );
+            // TODO: just save aspect ratio and layout
+            let layout = shared::layout(widget.as_ref().upcast_ref());
 
-                    layout
-                        .iter()
-                        .map(|c| {
-                            let lf = c.layout_frame.get();
-                            (lf.1 + lf.3).ceil() as i32
-                        })
-                        .max()
-                        .unwrap()
-                };
+            let last_frame = layout.last().unwrap().layout_frame.get();
 
-                self.widths.borrow_mut().insert(height, for_size);
-
-                (height, height)
-            } else {
-                let size = if for_size == -1 {
-                    270
-                } else {
-                    *self.widths.borrow_mut().get(&for_size).unwrap_or(&-1)
-                };
-
-                if size == -1 {
-                    (-1, -1)
-                } else {
-                    (64, size.max(64).min(480))
-                }
+            let aspect_ratio = {
+                let layout_width = last_frame.0 + last_frame.2;
+                let layout_height = last_frame.1 + last_frame.3;
+                layout_width / layout_height
             };
 
-            (min, size, -1, -1)
+            if for_size == -1 {
+                let size = if orientation == gtk::Orientation::Vertical {
+                    // height
+                    shared::TARGET_WIDTH / aspect_ratio
+                } else {
+                    shared::TARGET_WIDTH
+                };
+                return (0, size as i32, -1, -1);
+            };
+
+            let size = if orientation == gtk::Orientation::Vertical {
+                let width = for_size as f32;
+                width / aspect_ratio
+            } else {
+                let heigth = for_size as f32;
+                heigth * aspect_ratio
+            } as i32;
+
+            if orientation == gtk::Orientation::Vertical {
+                (size, size, -1, -1)
+            } else {
+                (0, size, -1, -1)
+            }
         }
 
         fn request_mode(&self) -> gtk::SizeRequestMode {
@@ -111,26 +104,14 @@ mod imp {
                     child.allocate(width, height, baseline, None);
                 }
             } else {
-                let layout =
-                    shared::layout(widget.as_ref().upcast_ref(), width, widget.spacing() as f32);
+                let layout = shared::layout(widget.as_ref().upcast_ref());
 
-                let last_frame = layout.last().unwrap().layout_frame.get();
+                let scale = width as f32 / 480.0;
+                let spacing = self.spacing.get() as f32;
 
-                let layout_height = (last_frame.1 + last_frame.3) as f32;
-
-                // Fit layout into smaller height if gtk didn't allocate required size
-                if layout_height > height as f32 {
-                    let scale = height as f32 / layout_height;
-
-                    layout.iter().for_each(|child| {
-                        let (x, y, w, h) = child.layout_frame.get();
-                        let y = y * scale;
-                        let h = h * scale;
-                        child.layout_frame.set((x, y, w, h))
-                    });
+                for (widget, cw) in widget.iter_children().zip(layout.iter()) {
+                    cw.apply(&widget, scale, spacing);
                 }
-
-                layout.iter().for_each(|c| c.allocate());
             }
         }
     }

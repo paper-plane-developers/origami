@@ -1,7 +1,6 @@
-mod child_wrapper;
+mod item;
 mod layout;
 mod position_flags;
 
-pub(crate) use self::position_flags::PositionFlags;
-pub(crate) use child_wrapper::ChildWrapper;
+pub(crate) use item::LayoutItem;
 pub(crate) use layout::layout_function;

@@ -1,4 +1,4 @@
-use super::child_wrapper::ChildWrapper;
+use super::item::LayoutItem;
 use super::position_flags::PositionFlags;
 
 const MIN_WIDTH: f32 = 70.0;
@@ -6,7 +6,7 @@ const MIN_WIDTH: f32 = 70.0;
 pub(crate) fn layout_function(
     child_count: usize,
     force_calc: bool,
-) -> fn(children: &[ChildWrapper], proportions: &str, average_aspect_ratio: f32, width: f32) {
+) -> fn(children: &[LayoutItem], proportions: &str, average_aspect_ratio: f32, width: f32) {
     if force_calc {
         layout_fallback
     } else {
@@ -20,7 +20,7 @@ pub(crate) fn layout_function(
 }
 
 fn layout_two_children(
-    children: &[ChildWrapper],
+    children: &[LayoutItem],
     proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
@@ -71,7 +71,7 @@ fn layout_two_children(
 }
 
 fn layout_three_children(
-    children: &[ChildWrapper],
+    children: &[LayoutItem],
     proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
@@ -152,7 +152,7 @@ fn layout_three_children(
 }
 
 fn layout_four_children(
-    children: &[ChildWrapper],
+    children: &[LayoutItem],
     proportions: &str,
     average_aspect_ratio: f32,
     width: f32,
@@ -240,7 +240,7 @@ fn layout_four_children(
 }
 
 fn layout_fallback(
-    children: &[ChildWrapper],
+    children: &[LayoutItem],
     _proportions: &str,
     average_aspect_ratio: f32,
     width: f32,

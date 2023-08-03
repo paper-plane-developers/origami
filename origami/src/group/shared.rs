@@ -1,7 +1,9 @@
 use super::*;
 
-pub(super) fn layout(widget: &gtk::Widget, width: i32, spacing: f32) -> Vec<ChildWrapper> {
-    let children: Vec<_> = widget.iter_children().map(ChildWrapper::new).collect();
+pub(super) const TARGET_WIDTH: f32 = 480.0;
+
+pub(super) fn layout(widget: &gtk::Widget) -> Vec<LayoutItem> {
+    let children: Vec<_> = widget.iter_children().map(LayoutItem::new).collect();
 
     let aspect_ratios = children.iter().map(|child| child.aspect_ratio);
 
@@ -24,26 +26,7 @@ pub(super) fn layout(widget: &gtk::Widget, width: i32, spacing: f32) -> Vec<Chil
 
     let layout_function = layout_function(children.len(), force_calc);
 
-    let width = width as f32;
-
-    // TODO: apply spacing
-    _ = spacing;
-
-    {
-        let width = 480.0;
-        layout_function(&children, &proportions, average_aspect_ratio, width);
-    }
-
-    let scale = width / 480.0;
-
-    for child in &children {
-        let mut frame = child.layout_frame.get();
-        frame.0 *= scale;
-        frame.1 *= scale;
-        frame.2 *= scale;
-        frame.3 *= scale;
-        child.layout_frame.set(frame);
-    }
+    layout_function(&children, &proportions, average_aspect_ratio, TARGET_WIDTH);
 
     children
 }
