@@ -1,4 +1,3 @@
-use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::clone;
 use gtk::{gdk, glib};

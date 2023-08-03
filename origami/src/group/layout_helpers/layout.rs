@@ -251,7 +251,7 @@ fn layout_fallback(
     }
 
     let cropped_ratios: Vec<_> = children
-        .into_iter()
+        .iter()
         .map(|c| {
             if average_aspect_ratio > 1.1 {
                 c.aspect_ratio.max(1.0)
