@@ -34,11 +34,11 @@ impl PositionFlags {
     }
 
     pub fn at_right(self) -> bool {
-        self.contains(Self::TOP)
+        self.contains(Self::RIGHT)
     }
 
     pub fn at_bottom(self) -> bool {
-        self.contains(Self::TOP)
+        self.contains(Self::BOTTOM)
     }
 
     pub fn at_left(self) -> bool {
