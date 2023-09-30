@@ -34,7 +34,7 @@ mod imp {
                     widget.imp().start_time.set(widget.time());
                     widget.add_tick_callback(|widget, _clock| {
                         widget.queue_draw();
-                        Continue(widget.is_visible())
+                        glib::ControlFlow::from(widget.is_visible())
                     });
                 }
             });

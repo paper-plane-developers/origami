@@ -36,20 +36,19 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for SpoilerWindow {
-        fn constructed(&self) {
-            self.parent_constructed();
+    impl ObjectImpl for SpoilerWindow {}
 
-            self.obj().connect_close_request(|window| {
-                window.application().unwrap().quit();
-                gtk::Inhibit(true)
-            });
+    impl WidgetImpl for SpoilerWindow {}
+
+    impl WindowImpl for SpoilerWindow {
+        fn close_request(&self) -> glib::Propagation {
+            self.obj().application().unwrap().quit();
+            self.parent_close_request()
         }
     }
 
-    impl WidgetImpl for SpoilerWindow {}
-    impl WindowImpl for SpoilerWindow {}
     impl ApplicationWindowImpl for SpoilerWindow {}
+
     impl AdwApplicationWindowImpl for SpoilerWindow {}
 }
 
