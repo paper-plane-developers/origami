@@ -53,7 +53,7 @@ mod imp {
                 if widget.playing() {
                     widget.add_tick_callback(|widget, _clock| {
                         widget.queue_draw();
-                        Continue(widget.playing())
+                        glib::ControlFlow::from(widget.playing())
                     });
                 }
             });

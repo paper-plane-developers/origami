@@ -18,7 +18,7 @@ template $OriDemoLoadingIndicatorPage : Adw.Bin {
                 $OriLoadingIndicator {
                     valign: center;
 
-                    progress: bind-property progress_adjustment.value;
+                    progress: bind progress_adjustment.value;
                 }
 
                 $OriLoadingIndicator {
@@ -26,7 +26,7 @@ template $OriDemoLoadingIndicatorPage : Adw.Bin {
                     height-request: 48;
                         width-request: 48;
                 
-                        progress: bind-property progress_adjustment.value;
+                        progress: bind progress_adjustment.value;
                     }
 
                     $OriLoadingIndicator {
@@ -34,7 +34,7 @@ template $OriDemoLoadingIndicatorPage : Adw.Bin {
                         height-request: 64;
                         width-request: 64;
                 
-                        progress: bind-property progress_adjustment.value;
+                        progress: bind progress_adjustment.value;
                     }
                 }
 
