@@ -7,7 +7,7 @@ template $OriDemoSpoilerPage : Adw.Bin {
             actions: copy;
             formats: "GdkFileList";
         }
-        
+
         orientation: vertical;
         vexpand: true;
 
@@ -32,12 +32,12 @@ template $OriDemoSpoilerPage : Adw.Bin {
                     vexpand: true;
 
                     // the most important property
-                    hidden: bind revealer.reveal-child inverted bidirectional;
+                    hidden: bind-property revealer.reveal-child inverted bidirectional;
 
                     child:  Adw.StatusPage {
                         title: "Drop any pictures here";
                         description: "To see how will they look under the spoiler";
-                    };    
+                    };
                 }
             }
         }

@@ -1,0 +1,16 @@
+data/com.github.paper_plane_developers.OrigamiDemo.desktop.in.in
+data/com.github.paper_plane_developers.OrigamiDemo.gschema.xml.in
+data/com.github.paper_plane_developers.OrigamiDemo.metainfo.xml.in.in
+
+src/application.rs
+src/main.rs
+src/window/loading_indicator/mod.rs
+src/window/mod.rs
+src/window/shimmer_effect/mod.rs
+src/window/spoiler/mod.rs
+
+src/window/shortcuts.ui
+src/window/loading_indicator/loading_indicator.blp
+src/window/shimmer_effect/shimmer_effect.blp
+src/window/spoiler/spoiler.blp
+src/window/window.blp
