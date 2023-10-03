@@ -1,0 +1,64 @@
+{
+    "id": "com.github.paper_plane_developers.OrigamiDemo.Devel",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "45",
+    "sdk": "org.gnome.Sdk",
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Extension.rust-stable",
+        "org.freedesktop.Sdk.Extension.llvm16"
+    ],
+    "command": "origami-demo",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=wayland",
+        "--device=dri",
+        "--env=RUST_LOG=origami_demo=debug",
+        "--env=G_MESSAGES_DEBUG=none",
+        "--env=RUST_BACKTRACE=1"
+    ],
+    "build-options": {
+        "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm16/bin",
+        "build-args": [
+            "--share=network"
+        ],
+        "env": {
+            "CARGO_REGISTRIES_CRATES_IO_PROTOCOL": "sparse",
+            "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "clang",
+            "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "-C link-arg=-fuse-ld=/usr/lib/sdk/rust-stable/bin/mold",
+            "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER": "clang",
+            "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "-C link-arg=-fuse-ld=/usr/lib/sdk/rust-stable/bin/mold"
+        },
+        "test-args": [
+            "--socket=x11",
+            "--share=network"
+        ]
+    },
+    "modules": [
+        {
+            "name": "blueprint-compiler",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler/-/archive/v0.10.0/blueprint-compiler-v0.10.0.tar.gz",
+                    "sha256": "eec8a2cf7aca70faff0cd96d2cdc610f76d7e302d0025b3d36a73c8c4583b6fd"
+                }
+            ]
+        },
+        {
+            "name": "origami-demo",
+            "buildsystem": "meson",
+            "run-tests": true,
+            "config-opts": [
+                "-Dprofile=development"
+            ],
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "../"
+                }
+            ]
+        }
+    ]
+}

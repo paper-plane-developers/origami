@@ -1,13 +1,13 @@
-mod loading_indicator;
-mod shimmer_effect;
-mod spoiler;
-
+use gtk::prelude::StaticType;
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{gio, glib};
 
-mod imp {
+mod loading_indicator;
+mod shimmer_effect;
+mod spoiler;
 
+mod imp {
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate)]
@@ -24,11 +24,11 @@ mod imp {
         type ParentType = adw::ApplicationWindow;
 
         fn class_init(klass: &mut Self::Class) {
+            klass.bind_template();
+
+            spoiler::SpoilerPage::static_type();
             loading_indicator::LoadingIndicatorPage::static_type();
             shimmer_effect::ShimmerEffectPage::static_type();
-            spoiler::SpoilerPage::static_type();
-
-            klass.bind_template();
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -36,7 +36,19 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for SpoilerWindow {}
+    impl ObjectImpl for SpoilerWindow {
+        fn constructed(&self) {
+            self.parent_constructed();
+
+            let obj = &*self.obj();
+
+            let shortcuts: gtk::ShortcutsWindow =
+                gtk::Builder::from_file("src/window/shortcuts.ui")
+                    .object("shortcuts")
+                    .unwrap();
+            obj.set_help_overlay(Some(&shortcuts));
+        }
+    }
 
     impl WidgetImpl for SpoilerWindow {}
 
