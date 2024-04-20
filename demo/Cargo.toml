@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-adw = { version = "0.5", package = "libadwaita" }
-gtk = { version = "0.7", package = "gtk4", features = ["v4_10", "blueprint"] }
+adw = { version = "0.6", package = "libadwaita" }
+gtk = { version = "0.8", package = "gtk4", features = ["v4_10", "blueprint"] }
 ori = { path = "../origami", package = "origami" }
