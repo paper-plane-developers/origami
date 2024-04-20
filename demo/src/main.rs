@@ -1,7 +1,6 @@
 mod window;
-use window::SpoilerWindow;
-
 use adw::prelude::*;
+use window::SpoilerWindow;
 
 fn main() {
     ori::init();

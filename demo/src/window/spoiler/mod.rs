@@ -1,7 +1,8 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::clone;
-use gtk::{gdk, glib};
+use gtk::gdk;
+use gtk::glib;
 
 mod imp {
     use super::*;
