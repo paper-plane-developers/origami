@@ -4,10 +4,10 @@ mod spoiler;
 
 use adw::prelude::*;
 use adw::subclass::prelude::*;
-use gtk::{gio, glib};
+use gtk::gio;
+use gtk::glib;
 
 mod imp {
-
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate)]

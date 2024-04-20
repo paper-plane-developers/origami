@@ -1,11 +1,12 @@
 use gtk::glib;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
+use std::cell::Cell;
+
+use gtk::graphene;
 
 mod imp {
     use super::*;
-    use gtk::graphene;
-    use std::cell::Cell;
 
     #[derive(Debug, Default, glib::Properties)]
     #[properties(wrapper_type = super::LoadingIndicator)]

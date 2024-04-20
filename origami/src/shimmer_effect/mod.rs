@@ -1,14 +1,16 @@
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::clone;
-use gtk::{glib, graphene, gsk};
+use gtk::glib;
+use gtk::graphene;
+use gtk::gsk;
+use std::cell::Cell;
 
 const GRADIENT_WIDTH: f32 = 256.0;
 const GRADIENT_PIXELS_PER_SEC: f32 = 100.0;
 
 mod imp {
     use super::*;
-    use std::cell::Cell;
 
     #[derive(Default, glib::Properties)]
     #[properties(wrapper_type = super::ShimmerEffect)]

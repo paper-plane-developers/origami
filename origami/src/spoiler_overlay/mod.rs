@@ -1,21 +1,29 @@
+use std::cell::Cell;
+use std::cell::OnceCell;
+use std::cell::RefCell;
+use std::sync::OnceLock;
+
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use glib::clone;
-use gtk::glib::once_cell::sync::Lazy;
-use gtk::{gdk, gio, glib, graphene, gsk};
+use gtk::gdk;
+use gtk::gio;
+use gtk::glib;
+use gtk::graphene;
+use gtk::gsk;
 
-static PARTICLE_TEXTURE: Lazy<gdk::Texture> = Lazy::new(|| {
-    let bytes = glib::Bytes::from_static(include_bytes!("turbulence_2x.png"));
-    gdk::Texture::from_bytes(&bytes).unwrap()
-});
+fn particle_texture() -> &'static gdk::Texture {
+    static PARTICLE_TEXTURE: OnceLock<gdk::Texture> = OnceLock::new();
+    PARTICLE_TEXTURE.get_or_init(|| {
+        let bytes = glib::Bytes::from_static(include_bytes!("turbulence_2x.png"));
+        gdk::Texture::from_bytes(&bytes).unwrap()
+    })
+}
 
 const BLUR_SHADER: &[u8] = include_bytes!("blur_shader.frag");
 
 mod imp {
-    use gtk::glib::once_cell::unsync::OnceCell;
-
     use super::*;
-    use std::cell::{Cell, RefCell};
 
     #[derive(Default, glib::Properties)]
     #[properties(wrapper_type = super::SpoilerOverlay)]
@@ -202,7 +210,7 @@ mod imp {
         fn ensure_shader(&self) {
             let widget = self.obj();
             if self.shader.borrow().is_none() {
-                let renderer = widget.native().unwrap().renderer();
+                let renderer = widget.native().unwrap().renderer().unwrap();
 
                 let shader = gsk::GLShader::from_bytes(&BLUR_SHADER.into());
                 match shader.compile(&renderer) {
@@ -240,7 +248,7 @@ mod imp {
                     snapshot.gl_shader_pop_texture();
                     snapshot.pop();
 
-                    let renderer = self.obj().native().unwrap().renderer();
+                    let renderer = self.obj().native().unwrap().renderer().unwrap();
 
                     let Some(node) = snapshot.to_node() else {
                         return; // nothing to render
@@ -265,7 +273,7 @@ mod imp {
             time: f32,
             speed_modifiers: &[(f32, f32)],
         ) {
-            let texture = &*PARTICLE_TEXTURE;
+            let texture = particle_texture();
 
             let texture_bounds = {
                 // Texture have 2x size, so we divide it to scale correctly;
