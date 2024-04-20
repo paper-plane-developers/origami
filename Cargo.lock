@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "demo"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "gtk4",
  "libadwaita",
@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "origami"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "gtk4",
  "libadwaita",
