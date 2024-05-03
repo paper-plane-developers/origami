@@ -37,12 +37,12 @@ fn init_style_sheet() {
 
     let refresh_style = move |style_manager: &adw::StyleManager| {
         if style_manager.is_dark() {
-            provider.load_from_data(concat!(
+            provider.load_from_string(concat!(
                 include_str!("./styles.css"),
                 include_str!("./styles-dark.css")
             ));
         } else {
-            provider.load_from_data(include_str!("./styles.css"));
+            provider.load_from_string(include_str!("./styles.css"));
         }
     };
 

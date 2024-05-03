@@ -117,12 +117,12 @@ mod imp {
                 } else if key == gdk::Key::Down {
                     1
                 } else {
-                    return gtk::Inhibit(false);
+                    return glib::Propagation::Proceed;
                 };
 
                 widget.set_selected(imp.selected.get() + shift);
 
-                gtk::Inhibit(false)
+                glib::Propagation::Proceed
             });
 
             widget.add_controller(key_controller);
@@ -147,7 +147,7 @@ mod imp {
             controller.connect_scroll(move |controller, _x, y| {
                 let widget = controller.widget().downcast::<Self::Type>().unwrap();
                 widget.imp().handle_scroll(y * 0.1);
-                gtk::Inhibit(true)
+                glib::Propagation::Stop
             });
 
             controller.connect_scroll_begin(move |controller| {
