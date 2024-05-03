@@ -1,3 +1,4 @@
+mod gradient_bg;
 mod loading_indicator;
 mod shimmer_effect;
 mod spoiler;
@@ -27,8 +28,9 @@ mod imp {
             loading_indicator::LoadingIndicatorPage::static_type();
             shimmer_effect::ShimmerEffectPage::static_type();
             spoiler::SpoilerPage::static_type();
+            gradient_bg::GradientBgPage::static_type();
 
-            klass.bind_template();
+            klass.bind_template()
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {

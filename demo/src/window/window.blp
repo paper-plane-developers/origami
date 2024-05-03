@@ -1,9 +1,8 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $SpoilerWindow : Adw.ApplicationWindow {
+template $SpoilerWindow: Adw.ApplicationWindow {
     height-request: 400;
-
     default-height: 580;
     default-width: 840;
 
@@ -27,7 +26,6 @@ template $SpoilerWindow : Adw.ApplicationWindow {
             StackSidebar {
                 vexpand: true;
                 width-request: 270;
-
                 stack: stack;
             }
         }
@@ -56,7 +54,6 @@ template $SpoilerWindow : Adw.ApplicationWindow {
 
                     child: Adw.StatusPage {
                         vexpand: true;
-
                         title: "Welcome to Origami Demo";
                     };
                 }
@@ -80,6 +77,13 @@ template $SpoilerWindow : Adw.ApplicationWindow {
                     title: "Shimmer Effect";
 
                     child: $OriDemoShimmerEffectPage {};
+                }
+
+                StackPage {
+                    name: "gradient_bg";
+                    title: "Gradient Background";
+
+                    child: $OriDemoGradientBgPage {};
                 }
             }
         }
