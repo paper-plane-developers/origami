@@ -2,28 +2,37 @@ using Gtk 4.0;
 using Adw 1;
 
 template $OriDemoGradientBgPage: Adw.Bin {
-    child: Box {
-        orientation: vertical;
-        vexpand: true;
+    DropTarget drop_target {
+        actions: copy;
+        formats: "GdkFileList";
+    }
 
-        Adw.PreferencesPage {
-            Adw.PreferencesGroup {
-                title: "Gradient Background";
+    child: Gtk.Overlay {
+        [overlay]
+        Box {
+            orientation: vertical;
+            valign: center;
+            spacing: 16;
 
-                header-suffix: Button animate {
-                    label: "Animate";
-                    clicked => $animate(template);
-                };
+            Button animate {
+                styles [
+                    "suggested-action",
+                    "circular"
+                ]
 
-                $OriGradientBg gradient_bg {
-                    styles [
-                        "card"
-                    ]
-
-                    overflow: hidden;
-                    vexpand: true;
-                }
+                icon-name: "media-playback-start-symbolic";
+                clicked => $animate(template);
+                valign: center;
+                halign: center;
             }
+
+            Label {
+                label: "Drag your single color svg pattern here";
+            }
+        }
+
+        $OriGradientBg gradient_bg {
+            vexpand: true;
         }
     };
 }
