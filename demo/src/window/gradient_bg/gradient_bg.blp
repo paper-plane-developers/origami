@@ -1,0 +1,29 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $OriDemoGradientBgPage: Adw.Bin {
+    child: Box {
+        orientation: vertical;
+        vexpand: true;
+
+        Adw.PreferencesPage {
+            Adw.PreferencesGroup {
+                title: "Gradient Background";
+
+                header-suffix: Button animate {
+                    label: "Animate";
+                    clicked => $animate(template);
+                };
+
+                $OriGradientBg gradient_bg {
+                    styles [
+                        "card"
+                    ]
+
+                    overflow: hidden;
+                    vexpand: true;
+                }
+            }
+        }
+    };
+}
