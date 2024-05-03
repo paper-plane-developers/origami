@@ -1,0 +1,93 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $OriDemoPictureGroupPage: Adw.Bin {
+    child: Adw.StatusPage {
+        DropTarget drop_target {
+            actions: copy;
+            formats: "GdkFileList";
+        }
+
+        title: "Picture Group";
+        description: "Drop pictures here";
+
+        Adw.Clamp {
+            child: Box {
+                orientation: vertical;
+                spacing: 16;
+
+                Adw.SpinRow {
+                    styles [
+                        "card"
+                    ]
+
+                    title: "Spacing";
+
+                    adjustment: Adjustment spacing_adjustment {
+                        lower: 0;
+                        upper: 16;
+                        step-increment: 1;
+                    };
+                }
+
+                $OriGroup group {
+                    spacing: bind spacing_adjustment.value;
+
+                    Adw.Bin {
+                        styles [
+                            "card"
+                        ]
+
+                        width-request: 6;
+                        height-request: 5;
+                    }
+
+                    Adw.Bin {
+                        styles [
+                            "card"
+                        ]
+
+                        width-request: 6;
+                        height-request: 7;
+                    }
+
+                    Adw.Bin {
+                        styles [
+                            "card"
+                        ]
+
+                        width-request: 8;
+                        height-request: 10;
+                    }
+
+                    Adw.Bin {
+                        styles [
+                            "card"
+                        ]
+
+                        width-request: 6;
+                        height-request: 7;
+                    }
+
+                    Adw.Bin {
+                        styles [
+                            "card"
+                        ]
+
+                        width-request: 8;
+                        height-request: 5;
+                    }
+
+                    Adw.Bin {
+                        styles [
+                            "card"
+                        ]
+
+                        width-request: 6;
+                        height-request: 8;
+                    }
+                }
+            };
+        }
+    };
+}

@@ -90,7 +90,7 @@ mod imp {
                 graphene::Rect::new(win_bounds.x() + shift, win_bounds.y(), GRADIENT_WIDTH, 1.0);
 
             let mut color1 = widget.color();
-            let mut color2 = color1.clone();
+            let mut color2 = color1;
             color1.set_alpha(0.6);
             color2.set_alpha(0.3);
 
