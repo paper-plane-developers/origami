@@ -1,23 +1,35 @@
 // Based on Mikhail Filimonov's code from
 // https://github.com/overtake/TelegramSwift/blob/master/packages/TGUIKit/Sources/SoftwareGradientBackground.swift
 
-pub type Color = gtk::graphene::Vec3;
+pub(super) struct Color {
+    r: f32,
+    g: f32,
+    b: f32,
+}
 
-#[derive(Debug, Clone, Copy)]
-pub struct Size {
-    pub width: u32,
-    pub height: u32,
+impl Color {
+    pub(super) fn new(r: f32, g: f32, b: f32) -> Self {
+        Self { r, g, b }
+    }
+
+    pub(super) fn from_int_rgb(rgb: i32) -> Self {
+        let r = (rgb >> 16) & 0xFF;
+        let g = (rgb >> 8) & 0xFF;
+        let b = rgb & 0xFF;
+
+        Self::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0)
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Point {
+pub(super) struct Point {
     pub x: f32,
     pub y: f32,
 }
 
 impl Point {
     #[doc(alias = "interpolatePoints")]
-    pub fn interpolate(self, other: Self, factor: f32) -> Self {
+    pub(super) fn interpolate(self, other: Self, factor: f32) -> Self {
         Self {
             x: self.x * (1.0 - factor) + other.x * factor,
             y: self.y * (1.0 - factor) + other.y * factor,
@@ -43,7 +55,7 @@ static BASE_POSITIONS: &[Point] = &[
 /// ```
 /// so I combined them and it's only possible to change the offset.
 #[doc(alias = "gatherPositions")]
-pub fn gather_positions(offset: usize) -> Vec<Point> {
+pub(super) fn gather_positions(offset: usize) -> Vec<Point> {
     BASE_POSITIONS
         .iter()
         .cycle()
@@ -56,8 +68,9 @@ pub fn gather_positions(offset: usize) -> Vec<Point> {
 
 /// Returns buffer for a texture with BGRA8 format.
 #[doc(alias = "generateGradient")]
-pub fn generate_gradient(
-    Size { width, height }: Size,
+pub(super) fn generate_gradient(
+    width: u32,
+    height: u32,
     colors: &[Color],
     positions: &[Point],
 ) -> Box<[u8]> {
@@ -102,9 +115,9 @@ pub fn generate_gradient(
                 distance = distance * distance * distance;
                 distance_sum += distance;
 
-                r += distance * color.x();
-                g += distance * color.y();
-                b += distance * color.z();
+                r += distance * color.r;
+                g += distance * color.g;
+                b += distance * color.b;
             }
 
             pixel[0] = (b / distance_sum * 255.0) as u8;

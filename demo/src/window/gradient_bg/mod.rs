@@ -79,23 +79,10 @@ glib::wrapper! {
         @extends adw::Bin, gtk::Widget;
 }
 
-fn hard_coded_theme_colors(dark: bool) -> Vec<gtk::graphene::Vec3> {
-    let colors = if dark {
-        vec![0xd6932e, 0xbc40db, 0x4280d7, 0x614ed5]
+fn hard_coded_theme_colors(dark: bool) -> &'static [i32] {
+    if dark {
+        &[0xd6932e, 0xbc40db, 0x4280d7, 0x614ed5]
     } else {
-        vec![0x94dae9, 0x9aeddb, 0x94c3f6, 0xac96f7]
-    };
-
-    let colors = colors
-        .into_iter()
-        .map(|int_color| {
-            let r = (int_color >> 16) & 0xFF;
-            let g = (int_color >> 8) & 0xFF;
-            let b = int_color & 0xFF;
-
-            gtk::graphene::Vec3::new(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0)
-        })
-        .collect();
-
-    colors
+        &[0x94dae9, 0x9aeddb, 0x94c3f6, 0xac96f7]
+    }
 }

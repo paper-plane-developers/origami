@@ -25,7 +25,7 @@ mod imp {
         pub(super) phase: Cell<u32>,
 
         pub(super) dark: Cell<bool>,
-        pub(super) colors: RefCell<Vec<graphene::Vec3>>,
+        pub(super) colors: RefCell<Vec<software_gradient::Color>>,
     }
 
     #[glib::object_subclass]
@@ -127,11 +127,8 @@ mod imp {
                 // but I think that 32x32 is better
                 let (width, height) = (32, 32);
 
-                let raw_texture = software_gradient::generate_gradient(
-                    software_gradient::Size { width, height },
-                    colors,
-                    &positions,
-                );
+                let raw_texture =
+                    software_gradient::generate_gradient(width, height, colors, &positions);
 
                 let texture = gdk::MemoryTexture::new(
                     width as i32,
@@ -222,8 +219,14 @@ impl GradientBg {
         self.imp().dark.set(dark);
     }
 
-    pub fn set_theme_colors(&self, colors: Vec<graphene::Vec3>) {
+    // Takes int colors as from theme returned by tdlib
+    pub fn set_theme_colors(&self, colors: &[i32]) {
         let imp = self.imp();
+
+        let colors = colors
+            .iter()
+            .map(|&int| software_gradient::Color::from_int_rgb(int))
+            .collect();
 
         imp.colors.replace(colors);
 
