@@ -36,8 +36,8 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            self.drop_target.connect_drop(
-                clone!(@to-owned self as imp => @default-return false, move
+            self.drop_target
+                .connect_drop(clone!(@to-owned self as imp, #[upgrade_or] false, move,
                     |_, value, _, _ | {
                         let Ok(file_list) = value.get::<gdk::FileList>() else { return false; };
 
@@ -60,8 +60,7 @@ mod imp {
 
                         true
                     }
-                ),
-            );
+                ));
         }
     }
 

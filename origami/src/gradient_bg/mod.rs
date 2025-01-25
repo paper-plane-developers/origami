@@ -47,24 +47,32 @@ mod imp {
                 obj.add_css_class("fallback");
             }
 
-            style_manager.connect_high_contrast_notify(clone!(@weak obj => move |style_manager| {
-                if style_manager.is_high_contrast() {
-                    obj.add_css_class("fallback");
+            style_manager.connect_high_contrast_notify(clone!(
+                #[weak]
+                obj,
+                move |style_manager| {
+                    if style_manager.is_high_contrast() {
+                        obj.add_css_class("fallback");
+                    }
                 }
-            }));
+            ));
 
-            let target = adw::CallbackAnimationTarget::new(clone!(@weak obj => move |progress| {
-                let imp = obj.imp();
-                imp.gradient_texture.take();
-                let progress = progress as f32;
-                if progress >= 1.0 {
-                    imp.progress.set(0.0);
-                    imp.phase.set((imp.phase.get() + 1) % 8);
-                } else {
-                    imp.progress.set(progress)
+            let target = adw::CallbackAnimationTarget::new(clone!(
+                #[weak]
+                obj,
+                move |progress| {
+                    let imp = obj.imp();
+                    imp.gradient_texture.take();
+                    let progress = progress as f32;
+                    if progress >= 1.0 {
+                        imp.progress.set(0.0);
+                        imp.phase.set((imp.phase.get() + 1) % 8);
+                    } else {
+                        imp.progress.set(progress)
+                    }
+                    obj.queue_draw();
                 }
-                obj.queue_draw();
-            }));
+            ));
 
             let animation = adw::TimedAnimation::builder()
                 .widget(&*obj)

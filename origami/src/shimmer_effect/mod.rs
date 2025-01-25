@@ -43,11 +43,15 @@ mod imp {
             self.parent_constructed();
             self.obj().connect_child_notify(|obj| {
                 if let Some(child) = obj.child() {
-                    child.connect_visible_notify(clone!(@weak obj => move |child| {
-                        if child.is_visible() {
-                            obj.queue_draw();
+                    child.connect_visible_notify(clone!(
+                        #[weak]
+                        obj,
+                        move |child| {
+                            if child.is_visible() {
+                                obj.queue_draw();
+                            }
                         }
-                    }));
+                    ));
                 }
             });
 
