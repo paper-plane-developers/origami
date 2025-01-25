@@ -42,23 +42,36 @@ mod imp {
             gradient_bg.set_dark(style_manager.is_dark());
             gradient_bg.set_theme_colors(hard_coded_theme_colors(style_manager.is_dark()));
 
-            style_manager.connect_dark_notify(clone!(@weak gradient_bg => move |style_manager| {
-                gradient_bg.set_dark(style_manager.is_dark());
-                gradient_bg.set_theme_colors(hard_coded_theme_colors(style_manager.is_dark()))
-            }));
+            style_manager.connect_dark_notify(clone!(
+                #[weak]
+                gradient_bg,
+                move |style_manager| {
+                    gradient_bg.set_dark(style_manager.is_dark());
+                    gradient_bg.set_theme_colors(hard_coded_theme_colors(style_manager.is_dark()))
+                }
+            ));
 
-            self.drop_target.connect_drop(
-                clone!(@weak gradient_bg => @default-return false, move
-                    |_, value, _, _ | {
-                        let Ok(file_list) = value.get::<gdk::FileList>() else { return false; };
+            self.drop_target.connect_drop(clone!(
+                #[weak]
+                gradient_bg,
+                #[upgrade_or]
+                false,
+                move,
+                |_, value, _, _| {
+                    let Ok(file_list) = value.get::<gdk::FileList>() else {
+                        return false;
+                    };
 
-                        let pattern_texture = file_list.files().iter().filter_map(|file| gdk::Texture::from_file(file).ok()).next();
-                        
-                        gradient_bg.set_pattern(pattern_texture);
-                        true
-                    }
-                ),
-            );
+                    let pattern_texture = file_list
+                        .files()
+                        .iter()
+                        .filter_map(|file| gdk::Texture::from_file(file).ok())
+                        .next();
+
+                    gradient_bg.set_pattern(pattern_texture);
+                    true
+                }
+            ));
         }
     }
 

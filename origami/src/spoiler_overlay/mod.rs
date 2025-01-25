@@ -82,11 +82,14 @@ mod imp {
                 }
             });
 
-            let target =
-                adw::CallbackAnimationTarget::new(clone!(@weak widget => move |progress| {
+            let target = adw::CallbackAnimationTarget::new(clone!(
+                #[weak]
+                widget,
+                move |progress| {
                     widget.imp().reveal_progress.set(progress as f32);
                     widget.queue_draw();
-                }));
+                }
+            ));
 
             let animation = adw::TimedAnimation::builder()
                 .widget(&*widget)
@@ -102,12 +105,16 @@ mod imp {
 
             let controller = gtk::GestureClick::builder().button(1).build();
 
-            controller.connect_pressed(clone!(@weak widget => move |_, _button, x, y| {
-                if widget.hidden() {
-                    widget.imp().click_point.set((x as f32, y as f32));
-                    widget.set_hidden(false);
+            controller.connect_pressed(clone!(
+                #[weak]
+                widget,
+                move |_, _button, x, y| {
+                    if widget.hidden() {
+                        widget.imp().click_point.set((x as f32, y as f32));
+                        widget.set_hidden(false);
+                    }
                 }
-            }));
+            ));
 
             self.obj().add_controller(controller);
         }
